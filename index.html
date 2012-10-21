@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<title>Utilities</title>
+	<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+	<section id="urlencode">
+		<h2>url-encode</h2>
+		<textarea id="urlencode_ta"></textarea>
+		<button id="urlencode_enc">url-encode</button>
+		<button id="urlencode_dec">url-decode</button>
+		<button id="urlencode_esc_enc">escape</button>
+		<button id="urlencode_esc_dec">unescape</button>
+	</section>
+
+	<section id="strlen">
+		<h2>strlen</h2>
+		<textarea id="strlen_ta"></textarea>
+		<select id="strlen_mode">
+			<option value="trim">trim whitespace</option>
+			<option value="include">count whitespace</option>
+			<option value="ignore">ignore all whitespace</option>
+		</select>
+		<label>Length: <span></span></label>
+	</section>
+
+	<section id="replace">
+		<h2>replace</h2>
+		<textarea class="half"></textarea>
+		<textarea></textarea>
+		<br class="clear">
+		<input type="text" id="replace_from" /> &#187;
+		<input type="text" id="replace_to" />
+	</section>
+
+	<section id="base64">
+		<h2>base64</h2>
+		<textarea id="base64_ta"></textarea>
+		<button id="base64_enc">encode</button>
+		<button id="base64_dec">decode</button>
+	</section>
+
+	<section id="hash">
+		<h2>hashes</h2>
+		<textarea id="hash_ta"></textarea>
+		<button id="hash_md5">MD5</button>
+		<button id="hash_sha1">SHA-1</button>
+		<button id="hash_sha256">SHA-256</button>
+	</section>
+
+	<section id="substr_count">
+		<h2>substr_count</h2>
+		<textarea id="substr_count_ta"></textarea>
+		<input type="text" id="substr_count_tf" />
+		CI <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
+		<label>Count: <span></span></label>
+	</section>
+
+	<section id="chmod_calc">
+		<h2>chmod_calc</h2>
+		<table border="0" cellspacing="0" cellpadding="2">
+			<tr>
+				<td>Permission</td>
+				<td>Owner</td>
+				<td>Group</td>
+				<td>Other</td>
+			</tr>
+			<tr>
+				<td>Read</td>
+				<td><input type="checkbox" class="chmod_cb" data-name="owner" value="4"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="group" value="4"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="other" value="4"></td>
+			</tr>
+			<tr>
+				<td>Write</td>
+				<td><input type="checkbox" class="chmod_cb" data-name="owner" value="2"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="group" value="2"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="other" value="2"></td>
+			</tr>
+			<tr>
+				<td>Execute</td>
+				<td><input type="checkbox" class="chmod_cb" data-name="owner" value="1"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="group" value="1"></td>
+				<td><input type="checkbox" class="chmod_cb" data-name="other" value="1"></td>
+			</tr>
+			<tr>
+				<td>Sticky Bit</td>
+				<td colspan="3">
+					<select id='chmod_sticky'>
+						<option value="0">None</option>
+						<option value="1">Sticky</option>
+						<option value="2">SetGID</option>
+						<option value="3">SetGID + Sticky </option>
+						<option value="4">SetUID</option>
+						<option value="5">SetUID + Sticky</option>
+						<option value="6">SetUID + SetGID</option>
+						<option value="7">SetUID + SetGID + Sticky</option>
+					</select>
+				</td>
+
+			</tr>
+		</table>
+		<label>octal: </label>
+		<input id="chmod_result_oct" value="0000" maxlength="4">
+		<input id="chmod_update_oct" type="button" value="Update">
+		<br>
+		<label>human: </label>
+		<input id="chmod_result_hum" value="---------" maxlength="9">
+		<input id="chmod_update_hum" type="button" value="Update">
+	</section>
+
+	<section>
+		<h2>Niemand weiß das</h2>
+	</section>
+
+	<script src="./jquery.js"></script>
+	<script src="./__base64.js"></script>
+	<script src="./__md5.js"></script>
+	<script src="./__sha1.js"></script>
+	<script src="./__sha256.js"></script>
+	<script src="./script.js"></script>
+
+
+</body>
+</html>

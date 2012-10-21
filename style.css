@@ -1,0 +1,52 @@
+* {
+	font-family: monospace;
+}
+html, body {
+	background: #efefef;
+
+}
+
+
+section {
+	position: relative;
+	border: 3px solid black;
+	padding: 20px 5px 5px 5px;
+	width: 23.75%;
+	display: inline-block;
+	float: left;
+	min-height: 128px;
+	margin: 30px 2px 0;
+}
+
+section h2 {
+	position: absolute;
+	padding: 0px 10px;
+	top: -38px;
+	left: 15px;
+	width: auto;
+	display: inline-block;
+	border: 3px solid black;
+	background: white;
+}
+
+textarea {
+	width: 99%;
+	display: block;
+	height: 100px;
+}
+textarea.half {
+	width: 48%;
+	float: left;
+}
+textarea.half + textarea {
+	width: 48%;
+	float: right;
+}
+button, select, input, textarea {
+	background-color: #efefef;
+	border: 1px solid black;
+	font-weight: bold;
+}
+br.clear {
+	clear: both;
+}
