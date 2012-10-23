@@ -389,6 +389,16 @@ var jQuery = window.jQuery;
 				$u.val(date.getTime()/1000);
 				break;
 			}
+			case 'todate': {
+				var date = new Date($u.val()*1000);
+				$d.val(date.getDate());
+				$m.val(date.getMonth()+1);
+				$y.val(date.getFullYear());
+				$hh.val(date.getHours());
+				$mm.val(date.getMinutes());
+				$ss.val(date.getSeconds());
+				break;
+			}
 		}
 		console.log(date);
 	}
