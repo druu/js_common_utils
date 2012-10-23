@@ -7,16 +7,22 @@
 	<link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-	<section id="urlencode">
+	<div id="topbar">
+		<input type="seach" id="topbar_search" placeholder=" filter..." />
+	</div>
+
+	<!-- URLENCODING -->
+	<script type="text/xtemplate" data-module="urlencode">
 		<h2>url-encode</h2>
 		<textarea id="urlencode_ta"></textarea>
 		<button id="urlencode_enc">url-encode</button>
 		<button id="urlencode_dec">url-decode</button>
 		<button id="urlencode_esc_enc">escape</button>
 		<button id="urlencode_esc_dec">unescape</button>
-	</section>
+	</script>
 
-	<section id="strlen">
+	<!-- STRING LENGTH -->
+	<script type="text/xtemplate" data-module="strlen">
 		<h2>strlen</h2>
 		<textarea id="strlen_ta"></textarea>
 		<select id="strlen_mode">
@@ -25,42 +31,47 @@
 			<option value="ignore">ignore all whitespace</option>
 		</select>
 		<label>Length: <span></span></label>
-	</section>
+	</script>
 
-	<section id="replace">
+	<!-- REGEX REPLACE -->
+	<script type="text/xtemplate" data-module="replace">
 		<h2>replace</h2>
 		<textarea class="half"></textarea>
 		<textarea></textarea>
 		<br class="clear">
 		<input type="text" id="replace_from" /> &#187;
 		<input type="text" id="replace_to" />
-	</section>
+	</script>
 
-	<section id="base64">
+	<!-- BASE64 -->
+	<script type="text/xtemplate" data-module="base64">
 		<h2>base64</h2>
 		<textarea id="base64_ta"></textarea>
 		<button id="base64_enc">encode</button>
 		<button id="base64_dec">decode</button>
-	</section>
+	</script>
 
-	<section id="hash">
+	<!-- HASHES -->
+	<script type="text/xtemplate" data-module="hash">
 		<h2>hashes</h2>
 		<textarea id="hash_ta"></textarea>
 		<button id="hash_md5">MD5</button>
 		<button id="hash_sha1">SHA-1</button>
 		<button id="hash_sha256">SHA-256</button>
-	</section>
+	</script>
 
-	<section id="substr_count">
+	<!-- SUBSTRING COUNT -->
+	<script type="text/xtemplate" data-module="substr_count">
 		<h2>substr_count</h2>
 		<textarea id="substr_count_ta"></textarea>
 		<input type="text" id="substr_count_tf" />
-		CI <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
+		<label for="substr_count_cb" title="Case-insensitive">CI</label> <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
 		<label>Count: <span></span></label>
-	</section>
+	</script>
 
-	<section id="chmod_calc">
-		<h2>chmod_calc</h2>
+	<!-- CHMOD 1 -->
+	<script type="text/xtemplate" data-module="chmod">
+		<h2>chmod</h2>
 		<table border="0" cellspacing="0" cellpadding="2">
 			<tr>
 				<td>Permission</td>
@@ -110,9 +121,64 @@
 		<label>human: </label>
 		<input id="chmod_result_hum" value="---------" maxlength="9">
 		<input id="chmod_update_hum" type="button" value="Update">
-	</section>
+	</script>
 
-	<section id="timestamps">
+	<!-- CHMOD 2 -->
+	<script type="text/xtemplate" data-module="chmod2">
+		<h2>chmod2</h2>
+		<table border="0" cellspacing="0" cellpadding="2">
+			<tr><td></td>
+				<td>read</td>
+				<td>write</td>
+				<td>exec</td>
+			</tr>
+			<tr><td>owner</td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+			</tr>
+			<tr><td>group</td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+			</tr>
+			<tr><td>other</td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+				<td><input type="checkbox" /></td>
+			</tr>
+			<tr><td>special</td>
+				<td><input type="checkbox" id="chmod2_uid"/> <label for="chmod2_uid">Set UID</label></td>
+				<td><input type="checkbox" id="chmod2_gid"/> <label for="chmod2_gid">Set GID</label></td>
+				<td><input type="checkbox" id="chmod2_sticky"/> <label for="chmod2_sticky">Sticky</label></td>
+			</tr>
+		</table>
+		<input id="chmod2_result_oct" value="0000" maxlength="4">
+		<input id="chmod2_result_hum" value="---------" maxlength="9">
+	</script>
+
+	<!-- TEXT TRANSFORMATIONS -->
+	<script type="text/xtemplate" data-module="texttransform">
+		<h2>text-transform</h2>
+		<textarea id="texttransform_ta"></textarea>
+		<button id="texttransform_upper">upper</button>
+		<button id="texttransform_lower">lower</button>
+		<button id="texttransform_words">words</button>
+		<button id="texttransform_ucfirst">uc1st/line</button>
+		<button id="texttransform_lcfirst">lc1st/line</button>
+	</script>
+
+	<!-- TEXT SORTING -->
+	<script type="text/xtemplate" data-module="textsort">
+		<h2>textsort</h2>
+		<textarea id="textsort_ta"></textarea>
+		<button id="textsort_asc">ascending</button>
+		<button id="textsort_desc">descending</button>
+		<button id="textsort_natasc">natural</button>
+		<button id="textsort_natdesc">natural desc</button>
+	</script>
+
+	<script type="text/xtemplate" data-module="timestamps">
 		<h2>timestamps</h2>
 		<input type="text" id="timestamps_u" placeholder="Unix Timestamp" />
 		<br/>
@@ -127,17 +193,14 @@
 			<option value="tostamp">Date &rarr; Unix Timestamp</option>
 			<option value="todate">Date &larr; Unix Timestamp</option>
 		</select>
-	</section>
+	</script>
 
-	<section>
-		<h2>Niemand weiß das</h2>
-	</section>
-
-	<script src="./jquery.js"></script>
-	<script src="./__base64.js"></script>
-	<script src="./__md5.js"></script>
-	<script src="./__sha1.js"></script>
-	<script src="./__sha256.js"></script>
-	<script src="./script.js"></script>
+	<script src="./assets/jquery182.js"></script>
+	<script src="./assets/base64.js"></script>
+	<script src="./assets/md5.js"></script>
+	<script src="./assets/sha1.js"></script>
+	<script src="./assets/sha256.js"></script>
+	<script src="./assets/natsort.js"></script>
+	<script src="./main.js"></script>
 </body>
 </html>
