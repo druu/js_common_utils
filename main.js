@@ -672,24 +672,22 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 
 	function ps(s){return utils.strPad(s.toString(),2);}
 	function convert() {
+		var d;
 		switch (mode) {
-			case 'tostamp': {
-				var date = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
-				$u.val(date.getTime()/1000);
+			case 'tostamp':
+				d = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
+				$u.val(d.getTime()/1000);
 				break;
-			}
-			case 'todate': {
-				var date = new Date($u.val()*1000);
-				$d.val(ps(date.getDate()));
-				$m.val(ps(date.getMonth()+1));
-				$y.val(date.getFullYear());
-				$hh.val(ps(date.getHours()));
-				$mm.val(ps(date.getMinutes()));
-				$ss.val(ps(date.getSeconds()));
+			case 'todate':
+				d = new Date($u.val()*1000);
+				$d.val(ps(d.getDate()));
+				$m.val(ps(d.getMonth()+1));
+				$y.val(d.getFullYear());
+				$hh.val(ps(d.getHours()));
+				$mm.val(ps(d.getMinutes()));
+				$ss.val(ps(d.getSeconds()));
 				break;
-			}
 		}
-		console.log(date);
 	}
 
 	$('#timestamps_mode').change(function () {
@@ -700,7 +698,7 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 	$('#timestamps > input').bind('keyup paste', convert);
 
 	// Initialise with current time
-	$u.val(Math.floor(new Date().valueOf()/1000));
+	$u.val(Math.floor((0+(+ new Date()))/1000));
 	var startmode=mode;mode='todate';convert();mode=startmode;
 });
 
