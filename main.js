@@ -670,6 +670,7 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 		$ss = $('#timestamps_ss'),
 		mode = 'tostamp';
 
+	function ps(s){return utils.strPad(s.toString(),2);}
 	function convert() {
 		switch (mode) {
 			case 'tostamp': {
@@ -679,12 +680,12 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 			}
 			case 'todate': {
 				var date = new Date($u.val()*1000);
-				$d.val(date.getDate());
-				$m.val(date.getMonth()+1);
+				$d.val(ps(date.getDate()));
+				$m.val(ps(date.getMonth()+1));
 				$y.val(date.getFullYear());
-				$hh.val(date.getHours());
-				$mm.val(date.getMinutes());
-				$ss.val(date.getSeconds());
+				$hh.val(ps(date.getHours()));
+				$mm.val(ps(date.getMinutes()));
+				$ss.val(ps(date.getSeconds()));
 				break;
 			}
 		}
