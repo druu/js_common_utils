@@ -21,7 +21,6 @@
 		<button id="urlencode_esc_dec">unescape</button>
 	</script>
 
-
 	<!-- STRING LENGTH -->
 	<script type="text/xtemplate" data-module="strlen">
 		<h2>strlen</h2>
@@ -34,7 +33,6 @@
 		<label>Length: <span></span></label>
 	</script>
 
-
 	<!-- REGEX REPLACE -->
 	<script type="text/xtemplate" data-module="replace">
 		<h2>replace</h2>
@@ -45,7 +43,6 @@
 		<input type="text" id="replace_to" />
 	</script>
 
-
 	<!-- BASE64 -->
 	<script type="text/xtemplate" data-module="base64">
 		<h2>base64</h2>
@@ -53,7 +50,6 @@
 		<button id="base64_enc">encode</button>
 		<button id="base64_dec">decode</button>
 	</script>
-
 
 	<!-- HASHES -->
 	<script type="text/xtemplate" data-module="hash">
@@ -63,7 +59,6 @@
 		<button id="hash_sha1">SHA-1</button>
 		<button id="hash_sha256">SHA-256</button>
 	</script>
-
 
 	<!-- SUBSTRING COUNT -->
 	<script type="text/xtemplate" data-module="substr_count">
@@ -128,7 +123,6 @@
 		<input id="chmod_update_hum" type="button" value="Update">
 	</script>
 
-
 	<!-- CHMOD 2 -->
 	<script type="text/xtemplate" data-module="chmod2">
 		<h2>chmod2</h2>
@@ -163,7 +157,6 @@
 		<input id="chmod2_result_hum" value="---------" maxlength="9">
 	</script>
 
-
 	<!-- TEXT TRANSFORMATIONS -->
 	<script type="text/xtemplate" data-module="texttransform">
 		<h2>text-transform</h2>
@@ -175,7 +168,6 @@
 		<button id="texttransform_lcfirst">lc1st/line</button>
 	</script>
 
-
 	<!-- TEXT SORTING -->
 	<script type="text/xtemplate" data-module="textsort">
 		<h2>textsort</h2>
@@ -186,6 +178,22 @@
 		<button id="textsort_natdesc">natural desc</button>
 	</script>
 
+	<script type="text/xtemplate" data-module="timestamps">
+		<h2>timestamps</h2>
+		<input type="text" id="timestamps_u" placeholder="Unix Timestamp" />
+		<br/>
+		<input type="text" id="timestamps_d" size="2" placeholder="DD" />
+		<input type="text" id="timestamps_m" size="2" placeholder="MM" />
+		<input type="text" id="timestamps_y" size="4" placeholder="YYYY" />
+		<input type="text" id="timestamps_hh" size="2" placeholder="HH" />
+		<input type="text" id="timestamps_mm" size="2" placeholder="MM" />
+		<input type="text" id="timestamps_ss" size="2" placeholder="SS" />
+		<br/>
+		<select	id="timestamps_mode">
+			<option value="tostamp">Date &rarr; Unix Timestamp</option>
+			<option value="todate">Date &larr; Unix Timestamp</option>
+		</select>
+	</script>
 
 	<script src="./assets/jquery182.js"></script>
 	<script src="./assets/base64.js"></script>
