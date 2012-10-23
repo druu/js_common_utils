@@ -409,6 +409,10 @@ var jQuery = window.jQuery;
 		convert();
 	});
 	$('#timestamps > input').bind('keyup paste', convert);
+
+	// Initialise with current time
+	$u.val(Math.floor(new Date().valueOf()/1000));
+	var startmode=mode;mode='todate';convert();mode=startmode;
 }(jQuery));
 
 jQuery(document).ready(function($){
