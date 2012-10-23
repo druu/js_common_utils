@@ -1,136 +1,25 @@
-/** global jQuery: true */
-var jsUtils = (function (window) {
-	"use strict";
-	var $,
-		modules = {},
-		activeModules,
-		jsUtils = {
-			fn: {
-				strPad: function (str, len, padChar) {
-					return (str.length >= len) && str || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
-				},
-				storageGet: function (key, fallback) {
-					var val;
-					try {
-						val = localStorage.getItem(String(key));
-						val = JSON.parse(val);
-						return val;
-					} catch (e) {
-						return fallback;
-					}
-				},
-				storageSet: function (key, val) {
-					try {
-						val = JSON.stringify(val);
-						localStorage.setItem(String(key), val);
-						return true;
-					} catch (e) {
-						return false;
-					}
-				}
-			}
-		};
+/** global jQuery: true, $:true */
+var jQuery = window.jQuery;
 
-
-	jsUtils.init = function () {
-		var $sections,
-			prop,
-			i,
-			$body;
-
-		$ = window.jQuery;
-		$body = $('body');
-
-		// get custom module activeModules from LocalStorage
-		// TODO: d&d reactiveModulesing, enabling/disabling
-		activeModules = jsUtils.fn.storageGet("jsutils-plugin-activeModules", null);
-		if (!(activeModules instanceof Array) || !activeModules.length) {
-			activeModules = [];
-			for (prop in modules) {
-
-				if (modules.hasOwnProperty(prop)) {
-					activeModules.push(prop);
-				}
-			}
-		}
-
-		// instantiate
-		for (i = 0; i < activeModules.length; i += 1) {
-			if (!(activeModules[i] in modules)) {
-				continue;
-			}
-			$body.append(
-				$('<section id="' + activeModules[i] + '"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
-			);
-			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, jsUtils.fn]);
-		}
-
-		// force equal container height
-		$sections = $('section');
-		$sections.height(Math.max.apply(Math, $sections.map(function () { return $(this).height(); })));
-
-		// search field
-		$(document).on('keyup', function (e) {
-			if ((e.charCode || e.keyCode) === 27) {
-				$('#topbar_search').focus();
-			}
-		});
-
-		$('#topbar_search').on('keyup', function (e) {
-			var keywords, k, m;
-
-			if ((e.charCode || e.keyCode) === 27) {
-				$('#topbar_search').val("").trigger('keyup').blur();
-				e.stopPropagation();
-				return;
-			}
-
-			keywords = $('#topbar_search').val().replace(/[^A-Za-z0-9\_\-\s]/g, '').trim();
-			if (!keywords.length) {
-				keywords = ".";
-			}
-			keywords = keywords.split(/\s+/).map(function (word,a,i) { return new RegExp(word); });
-
-			myfacewhenjshaslabels: for (m = 0; m < activeModules.length; m += 1) {
-				for (k = 0; k < keywords.length; k += 1) {
-					if (!keywords[k].test(activeModules[m])) {
-						$('#' + activeModules[m]).hide();
-						continue myfacewhenjshaslabels;
-					}
-				}
-				$('#' + activeModules[m]).show();
-			}
-		}).focus();
-	};
-
-
-	jsUtils.register = function (name, constructor) {
-		modules[name] = constructor;
-	};
-
-	return jsUtils;
-}(window));
-
-jsUtils.register("urlencode", function (name, $container, $, utils) {
-	"use strict";
+(function ($) {
 	var $ta = $('#urlencode_ta');
-
-	$('#urlencode_enc').on('click', function (e) {
+	$('#urlencode_enc').click(function (e) {
 		$ta.val(encodeURIComponent($ta.val()).replace(/%20/g, '+'));
 	});
-	$('#urlencode_dec').on('click', function (e) {
+	$('#urlencode_dec').click(function (e) {
 		$ta.val(decodeURIComponent($ta.val()).replace(/\+/g, ' '));
 	});
-	$('#urlencode_esc_enc').on('click', function (e) {
+	$('#urlencode_esc_enc').click(function (e) {
 		$ta.val(window.escape($ta.val()));
 	});
-	$('#urlencode_esc_dec').on('click', function (e) {
+	$('#urlencode_esc_dec').click(function (e) {
 		$ta.val(window.unescape($ta.val()));
 	});
-});
+}(jQuery));
 
-jsUtils.register("strlen", function (name, $container, $, utils) {
-	"use strict";
+
+
+(function ($) {
 	var $ta = $('#strlen_ta'),
 		$out = $('#strlen').find('label span'),
 		mode = "trim";
@@ -147,15 +36,18 @@ jsUtils.register("strlen", function (name, $container, $, utils) {
 
 	$('#strlen').find('select').click(function () {
 		mode = $(this).val();
+		console.log(mode);
 		measure();
 	});
 	$ta.bind('keyup paste click blur focus', measure);
 	measure();
-});
+}(jQuery));
 
-jsUtils.register("replace", function (name, $container, $, utils) {
-	"use strict";
-	var $ta_from = $container.find('textarea:first'),
+
+
+(function ($) {
+	var $container = $('#replace'),
+		$ta_from = $container.find('textarea:first'),
 		$ta_to = $container.find('textarea:last'),
 		$tf_from = $container.find('input:first'),
 		$tf_to = $container.find('input:last'),
@@ -191,12 +83,13 @@ jsUtils.register("replace", function (name, $container, $, utils) {
 		replace();
 	});
 	$ta_from.bind('keyup blur paste', replace);
-});
 
-jsUtils.register("base64", function (name, $container, $, utils) {
-	"use strict";
+}(jQuery));
+
+
+
+(function ($) {
 	var $ta = $('#base64_ta');
-
 	$('#base64_enc').click(function (e) {
 		$ta.val(window.base64.encode($ta.val()));
 	});
@@ -205,26 +98,25 @@ jsUtils.register("base64", function (name, $container, $, utils) {
 			$ta.val(window.base64.decode($ta.val()));
 		} catch (ex) {}
 	});
-});
+}(jQuery));
 
-jsUtils.register("hash", function (name, $container, $, utils) {
-	"use strict";
-
+(function ($) {
 	var $ta = $('#hash_ta');
 	$('#hash_md5, #hash_sha1, #hash_sha256').click(function () {
 		var funcmap = {
 			"hash_md5": window.md5,
 			"hash_sha1": window.sha1,
-			"hash_sha256": $.sha256
+			"hash_sha256": $.sha256,
 		};
 		$ta.val(
 			$ta.val().replace(/\r/g, "\n").replace(/\n{2,}/g, "\n").trim().split("\n").map(funcmap[this.id]).join("\n")
 		);
 	});
-});
+}(jQuery));
 
-jsUtils.register("substr_count", function (name, $container, $, utils) {
-	"use strict";
+
+
+(function ($) {
 	var $ta = $('#substr_count_ta'),
 		$cb = $('#substr_count_cb'),
 		$tf = $('#substr_count_tf'),
@@ -261,10 +153,9 @@ jsUtils.register("substr_count", function (name, $container, $, utils) {
 	$tf.bind('keyup blur paste', recount);
 	$ta.bind('keyup blur paste', recount);
 	recount();
-});
+}(jQuery));
 
-jsUtils.register("chmod", function (name, $container, $, utils) {
-	"use strict";
+(function($) {
 	var $all_cb     = $('.chmod_cb'),
 		$sticky_sel = $('#chmod_sticky'),
 		$chmod_oct  = $('#chmod_result_oct'),
@@ -323,7 +214,7 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 				return output;
 			};
 			return perms;
-		}()),
+		})(),
 		update = function(which) {
 			switch (which) {
 				case "octal":
@@ -360,7 +251,7 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 				other  : 3
 			},
 			p_vals = [4,2,1],
-			i, el, bs, bs_sticky, checked;
+			i, el, bs, bs_sticky, special_case, checked;
 
 		if (len === 3) {
 			val = replaceAt(1, val, '0000');
@@ -386,10 +277,9 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 
 				bs = permissions[el].toString(2);
 				bs = replaceAt(3 - bs.length, bs, '000');
-
 				for(i = 0; i < 3; i +=1) {
 					checked = bs.charAt(i) === '1';
-					if (i === 2 && bs_sticky.charAt(p_groups.el) === '1') {
+					if (i == 2 && bs_sticky.charAt(p_groups[el]) === '1') {
 						checked = false;
 					}
 
@@ -479,188 +369,10 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 
 		update('octal');
 	});
-});
-
-jsUtils.register("chmod2", function (name, $container, $, utils) {
-	"use strict";
-	var $all_cb = $container.find('input[type="checkbox"]'),
-		tf_oct = $('#chmod2_result_oct')[0],
-		tf_hum = $('#chmod2_result_hum')[0],
-
-		validRe = {
-			octal: /^[0-7]{4}$/,
-			human: /^([\-r][\-w][\-xSs]){2}[\-r][\-w][\-xtT]$/
-		},
-
-		octal2cb = function (octalstr) {
-			var octalnum;
-
-			if (!validRe.octal.test(octalstr)) {
-				throw "Invalid octal";
-			}
-			octalnum = parseInt(octalstr, 8);
-
-			$all_cb.each(function (i) {
-				this.checked = !!((1 << (11 - i)) & octalnum);
-			});
-		},
-
-		cb2octal = function () {
-			var num = 0;
-
-			$all_cb.each(function (i) {
-				if (this.checked) {
-					num += 1 << (11 - i);
-				}
-			});
-
-			return utils.strPad(num.toString(8), 4);
-		},
+})(jQuery);
 
 
-		human2octal = function (str) {
-			if (!validRe.human.test(str)) {
-				throw "Invalid human-readable string";
-			}
-
-			str = parseInt(
-				(/s/i.test(str.charAt(2)) ? '1' : '0') +
-				(/s/i.test(str.charAt(5)) ? '1' : '0') +
-				(/t/i.test(str.charAt(8)) ? '1' : '0') +
-				str.replace(/-|[ST]/g, '0').replace(/[^0]/g, '1'), 2).
-				toString(8);
-			return utils.strPad(str, 4);
-		},
-
-		octal2human = function (str) {
-			var charMap = ["r", "w", "x"],
-				specialMap = ["s", "s", "t"],
-				special;
-
-			if (!validRe.octal.test(str)) {
-				throw "Invalid octal";
-			}
-
-			str = utils.strPad(parseInt(str, 8).toString(2), 12);
-			special = str.substring(0, 3);
-			str = str.substring(3);
-
-			return str.split('').map(function (e, i) {
-					var mod = i % 3,
-						index = Math.floor(i / 3);
-
-					if (mod === 2 && special.charAt(index) === '1') {
-						return e === "0" ? specialMap[index].toUpperCase() : specialMap[index];
-					}
-					return e === "0" ? '-' : charMap[mod];
-				}).join('');
-		},
-
-		checkboxTrigger = function (e) {
-			var oct = cb2octal();
-			tf_oct.value = oct;
-			tf_hum.value = octal2human(oct);
-		},
-
-		octalTrigger = function (e) {
-			var octval = tf_oct.value.trim();
-
-			if (!validRe.octal.test(octval)) {
-				tf_hum.value = "ERROR";
-				octal2cb('0000');
-				return;
-			}
-			octal2cb(octval);
-			tf_hum.value = octal2human(octval);
-		},
-
-		humanTrigger = function (e) {
-			var humval = tf_hum.value.trim(),
-				octval;
-
-			if (!validRe.human.test(humval)) {
-				tf_oct.value = "ERROR";
-				octal2cb('0000');
-				return;
-			}
-			octval = human2octal(humval);
-			tf_oct.value = octval;
-			octal2cb(octval);
-		};
-
-	// re-order checkbox collection from "u-g-o-special" to "special-u-g-o"
-	$all_cb = $.merge($all_cb.slice(9), $all_cb.slice(0, 9));
-
-	$('#chmod2_result_oct').on('keyup blur', octalTrigger);
-	$('#chmod2_result_hum').on('keyup blur', humanTrigger);
-	$container.
-		find('table').
-		on('change', 'input:checkbox', checkboxTrigger).
-		on('click', 'td', function (e) {
-			if (e.target !== this) {
-				return;
-			}
-			var $cb = $(this).find('input[type="checkbox"]');
-			$cb.prop('checked', !$cb.prop('checked')).change();
-		});
-});
-
-jsUtils.register("texttransform", function (name, $container, $, utils) {
-	"use strict";
-	var $ta = $('#texttransform_ta');
-
-	$('#texttransform_upper').on('click', function () {
-		$ta.val($ta.val().toUpperCase());
-	});
-	$('#texttransform_lower').on('click', function () {
-		$ta.val($ta.val().toLowerCase());
-	});
-	$('#texttransform_words').on('click', function () {
-		$ta.val($ta.val().replace(/\b([A-Za-z])/g, function (a) {return a.toUpperCase();}));
-	});
-	$('#texttransform_ucfirst,#texttransform_lcfirst').on('click', function () {
-		var transFunc = /ucfirst/.test(this.id) ? "toUpperCase" : "toLowerCase";
-
-		$ta.val(
-			$ta.
-				val().
-				replace(/\r/g, "\n").
-				replace(/\n{2,}/g, "\n").
-				split("\n").
-				map(function (line) {
-					var first = line.charAt(0),
-						transformed = first[transFunc]();
-					return transformed === first ? line : transformed + line.substring(1);
-				}).
-				join("\n")
-		);
-	});
-});
-
-jsUtils.register("textsort", function (name, $container, $, utils) {
-	"use strict";
-	var $ta = $('#textsort_ta');
-
-	$('#textsort_asc,#textsort_desc,#textsort_natasc,#textsort_natdesc').on('click', function () {
-		var val = $ta.
-				val().
-				replace(/\r/g, "\n").
-				replace(/\n{2,}/g, "\n").
-				split("\n");
-
-		if (/_nat/.test(this.id)) {
-			val.sort(window.naturalSort);
-		} else {
-			val.sort();
-		}
-		if (/desc/.test(this.id)) {
-			val.reverse();
-		}
-		$ta.val(val.join('\n'));
-	});
-});
-
-jsUtils.register('timestamps', function (name, $container, $, utils) {
+(function ($) {
 	var $u = $('#timestamps_u'),
 		$d = $('#timestamps_d'),
 		$m = $('#timestamps_m'),
@@ -670,7 +382,6 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 		$ss = $('#timestamps_ss'),
 		mode = 'tostamp';
 
-	function ps(s){return utils.strPad(s.toString(),2);}
 	function convert() {
 		switch (mode) {
 			case 'tostamp': {
@@ -680,12 +391,12 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 			}
 			case 'todate': {
 				var date = new Date($u.val()*1000);
-				$d.val(ps(date.getDate()));
-				$m.val(ps(date.getMonth()+1));
+				$d.val(date.getDate());
+				$m.val(date.getMonth()+1);
 				$y.val(date.getFullYear());
-				$hh.val(ps(date.getHours()));
-				$mm.val(ps(date.getMinutes()));
-				$ss.val(ps(date.getSeconds()));
+				$hh.val(date.getHours());
+				$mm.val(date.getMinutes());
+				$ss.val(date.getSeconds());
 				break;
 			}
 		}
@@ -702,6 +413,11 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 	// Initialise with current time
 	$u.val(Math.floor(new Date().valueOf()/1000));
 	var startmode=mode;mode='todate';convert();mode=startmode;
-});
+}(jQuery));
 
-jQuery(jsUtils.init);
+jQuery(document).ready(function($){
+	var $all_sections = $('section'),
+		min_height = 0;
+
+	$all_sections.each(function(){var h = $(this).height(); min_height = h > min_height ? h : min_height;}).height(min_height);
+});
