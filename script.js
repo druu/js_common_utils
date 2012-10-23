@@ -371,11 +371,39 @@ var jQuery = window.jQuery;
 	});
 })(jQuery);
 
+
+(function ($) {
+	var $u = $('#timestamps_u'),
+		$d = $('#timestamps_d'),
+		$m = $('#timestamps_m'),
+		$y = $('#timestamps_y'),
+		$hh = $('#timestamps_hh'),
+		$mm = $('#timestamps_mm'),
+		$ss = $('#timestamps_ss'),
+		mode = 'tostamp';
+
+	function convert() {
+		switch (mode) {
+			case 'tostamp': {
+				var date = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
+				$u.val(date.getTime()/1000);
+				break;
+			}
+		}
+		console.log(date);
+	}
+
+	$('#timestamps_mode').change(function () {
+		mode = $(this).val();
+		console.log(mode);
+		convert();
+	});
+	$('#timestamps > input').bind('keyup paste', convert);
+}(jQuery));
+
 jQuery(document).ready(function($){
 	var $all_sections = $('section'),
 		min_height = 0;
 
 	$all_sections.each(function(){var h = $(this).height(); min_height = h > min_height ? h : min_height;}).height(min_height);
-
-
 });
