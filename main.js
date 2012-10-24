@@ -9,6 +9,23 @@ var jsUtils = (function (window) {
 				strPad: function (str, len, padChar) {
 					return (str.length >= len) && str || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
 				},
+				strRepeat: function (str, times) {
+					var output = '';
+					while (times) {
+						output += str;
+						times -= 1;
+					}
+					return output;
+				},
+				strShuffle: function (str) {
+					if (arguments.length === 0 || !str) { return '';}
+					var output = '', len = str.length, i = len;
+					while(i) {
+						output += str.charAt(Math.floor(Math.random() * len));
+						i -= 1;
+					}
+					return output;
+				},
 				storageGet: function (key, fallback) {
 					var val;
 					try {
@@ -30,7 +47,6 @@ var jsUtils = (function (window) {
 				}
 			}
 		};
-
 
 
 	jsUtils.init = function () {
@@ -112,9 +128,6 @@ var jsUtils = (function (window) {
 	return jsUtils;
 }(window));
 
-
-
-
 jsUtils.register("urlencode", function (name, $container, $, utils) {
 	"use strict";
 	var $ta = $('#urlencode_ta');
@@ -132,8 +145,6 @@ jsUtils.register("urlencode", function (name, $container, $, utils) {
 		$ta.val(window.unescape($ta.val()));
 	});
 });
-
-
 
 jsUtils.register("strlen", function (name, $container, $, utils) {
 	"use strict";
@@ -158,8 +169,6 @@ jsUtils.register("strlen", function (name, $container, $, utils) {
 	$ta.bind('keyup paste click blur focus', measure);
 	measure();
 });
-
-
 
 jsUtils.register("replace", function (name, $container, $, utils) {
 	"use strict";
@@ -201,8 +210,6 @@ jsUtils.register("replace", function (name, $container, $, utils) {
 	$ta_from.bind('keyup blur paste', replace);
 });
 
-
-
 jsUtils.register("base64", function (name, $container, $, utils) {
 	"use strict";
 	var $ta = $('#base64_ta');
@@ -232,8 +239,6 @@ jsUtils.register("hash", function (name, $container, $, utils) {
 		);
 	});
 });
-
-
 
 jsUtils.register("substr_count", function (name, $container, $, utils) {
 	"use strict";
@@ -493,8 +498,6 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 	});
 });
 
-
-
 jsUtils.register("chmod2", function (name, $container, $, utils) {
 	"use strict";
 	var $all_cb = $container.find('input[type="checkbox"]'),
@@ -617,9 +620,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 			var $cb = $(this).find('input[type="checkbox"]');
 			$cb.prop('checked', !$cb.prop('checked')).change();
 		});
-
 });
-
 
 jsUtils.register("texttransform", function (name, $container, $, utils) {
 	"use strict";
@@ -653,7 +654,6 @@ jsUtils.register("texttransform", function (name, $container, $, utils) {
 	});
 });
 
-
 jsUtils.register("textsort", function (name, $container, $, utils) {
 	"use strict";
 	var $ta = $('#textsort_ta');
@@ -676,6 +676,87 @@ jsUtils.register("textsort", function (name, $container, $, utils) {
 		$ta.val(val.join('\n'));
 	});
 });
+
+jsUtils.register('timestamps', function (name, $container, $, utils) {
+	var $u = $('#timestamps_u'),
+		$d = $('#timestamps_d'),
+		$m = $('#timestamps_m'),
+		$y = $('#timestamps_y'),
+		$hh = $('#timestamps_hh'),
+		$mm = $('#timestamps_mm'),
+		$ss = $('#timestamps_ss'),
+		mode = 'tostamp';
+
+	function ps(s){return utils.strPad(s.toString(),2);}
+	function convert() {
+		var d;
+		switch (mode) {
+			case 'tostamp':
+				d = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
+				$u.val(d.getTime()/1000);
+				break;
+			case 'todate':
+				d = new Date($u.val()*1000);
+				$d.val(ps(d.getDate()));
+				$m.val(ps(d.getMonth()+1));
+				$y.val(d.getFullYear());
+				$hh.val(ps(d.getHours()));
+				$mm.val(ps(d.getMinutes()));
+				$ss.val(ps(d.getSeconds()));
+				break;
+		}
+	}
+
+	$('#timestamps_mode').change(function () {
+		mode = $(this).val();
+		console.log(mode);
+		convert();
+	});
+	$('#timestamps > input').bind('keyup paste', convert);
+
+	// Initialise with current time
+	$u.val(Math.floor((0+(+ new Date()))/1000));
+	var startmode=mode;mode='todate';convert();mode=startmode;
+});
+
+jsUtils.register('rndstring', function (name, $container, $, utils){
+	"use strict";
+	var $ta  = $('#rndstring_ta'),
+		$sel     = $('#rndstring_sel'),
+		$chars   = $('#rndstring_c'),
+		$len     = $('#rndstring_l'),
+		$go      = $('#rndstring_go'),
+		get_strpool, output;
+
+	get_strpool = (function($chars){
+		var pool = {none:''};
+
+		pool.numeric      = "0123456789";
+		pool.alpha_low    = "abcdefghijklmnopqrstuvwxyz";
+		pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
+		pool.alphanum_low = pool.alpha_low + pool.numeric;
+		pool.alphanum     = pool.alpha     + pool.numeric;
+		pool.hex          = pool.alphanum_low.replace(/[^a-f0-9]*/g, '').toUpperCase();
+
+		return function(base){
+			return (pool[base] || '') + $chars.val();
+		};
+	}($chars));
+
+	$go.on('click', function () {
+		var len, pool, output;
+		len = parseInt($len.val(), 10);
+		pool = get_strpool($sel.val());
+
+		output = (utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length)))).substring(0, len);
+
+		$ta.val(output);
+	});
+
+
+});
+
+
 
 
 jQuery(jsUtils.init);
