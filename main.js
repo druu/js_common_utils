@@ -1,14 +1,20 @@
 /** global jQuery: true */
-var jsUtils = (function (window) {
+var jsUtils = (function (window, $) {
 	"use strict";
-	var $,
-		modules = {},
+	var modules = {},
 		activeModules,
 		jsUtils = {
 			fn: {
 				strPad: function (str, len, padChar) {
-					return (str.length >= len) && str || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
+					if (!len) {
+						len = 2;
+					}
+					str = String(str);
+					return (str.length >= len && str) || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
 				},
+<<<<<<< HEAD
+				
+=======
 				strRepeat: function (str, times) {
 					var output = '';
 					while (times) {
@@ -26,16 +32,18 @@ var jsUtils = (function (window) {
 					}
 					return output;
 				},
+>>>>>>> develop
 				storageGet: function (key, fallback) {
 					var val;
 					try {
 						val = localStorage.getItem(String(key));
-						val = JSON.parse(val);
+						val = (typeof "val" === "string" && JSON.parse(val)) || fallback;
 						return val;
 					} catch (e) {
 						return fallback;
 					}
 				},
+				
 				storageSet: function (key, val) {
 					try {
 						val = JSON.stringify(val);
@@ -53,10 +61,7 @@ var jsUtils = (function (window) {
 		var $sections,
 			prop,
 			i,
-			$body;
-
-		$ = window.jQuery;
-		$body = $('body');
+			$body = $('body');
 
 		// get custom module activeModules from LocalStorage
 		// TODO: d&d reactiveModulesing, enabling/disabling
@@ -106,7 +111,7 @@ var jsUtils = (function (window) {
 			if (!keywords.length) {
 				keywords = ".";
 			}
-			keywords = keywords.split(/\s+/).map(function (word,a,i) { return new RegExp(word); });
+			keywords = keywords.split(/\s+/).map(function (word) { return new RegExp(word); });
 
 			myfacewhenjshaslabels: for (m = 0; m < activeModules.length; m += 1) {
 				for (k = 0; k < keywords.length; k += 1) {
@@ -126,7 +131,7 @@ var jsUtils = (function (window) {
 	};
 
 	return jsUtils;
-}(window));
+}(window, jQuery));
 
 jsUtils.register("urlencode", function (name, $container, $, utils) {
 	"use strict";
@@ -432,14 +437,8 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 			sticky       = '',
 			special_case = false,
 			checked      = false,
-			v            = {
-				'r' : 4,
-				'w' : 2,
-				'x' : 1, 's' : 1, 'S' : 1, 't' : 1, 'T' : 1,
-				'-' : 0
-			},
 			v_input      = [4,2,1],
-			m, n, i, c, sb, sgid, suid;
+			m, n, i, c;
 
 		if (len !== 9) {
 			val = replaceAt(0, val, '---------');
@@ -678,6 +677,7 @@ jsUtils.register("textsort", function (name, $container, $, utils) {
 });
 
 jsUtils.register('timestamps', function (name, $container, $, utils) {
+	"use strict";
 	var $u = $('#timestamps_u'),
 		$d = $('#timestamps_d'),
 		$m = $('#timestamps_m'),
@@ -687,36 +687,39 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 		$ss = $('#timestamps_ss'),
 		mode = 'tostamp';
 
-	function ps(s){return utils.strPad(s.toString(),2);}
-	function convert() {
-		var d;
+	function ps (s)  { 
+		return utils.strPad(s.toString(), 2);
+	}
+	function convert () {
+		var d,
+			startmode;
+		
 		switch (mode) {
 			case 'tostamp':
-				d = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
-				$u.val(d.getTime()/1000);
+				d = new Date($y.val(), $m.val() - 1, $d.val(), $hh.val(), $mm.val(), $ss.val());
+				$u.val(d.getTime() / 1000);
 				break;
 			case 'todate':
-				d = new Date($u.val()*1000);
-				$d.val(ps(d.getDate()));
-				$m.val(ps(d.getMonth()+1));
-				$y.val(d.getFullYear());
-				$hh.val(ps(d.getHours()));
-				$mm.val(ps(d.getMinutes()));
-				$ss.val(ps(d.getSeconds()));
+				d = new Date($u.val() * 1000);
+				$d.val(utils.strPad(d.getUTCDate()));
+				$m.val(utils.strPad(d.getUTCMonth() + 1));
+				$y.val(d.getUTCFullYear());
+				$hh.val(utils.strPad(d.getUTCHours()));
+				$mm.val(utils.strPad(d.getUTCMinutes()));
+				$ss.val(utils.strPad(d.getUTCSeconds()));
 				break;
 		}
 	}
 
 	$('#timestamps_mode').change(function () {
 		mode = $(this).val();
-		console.log(mode);
 		convert();
 	});
 	$('#timestamps > input').bind('keyup paste', convert);
 
 	// Initialise with current time
-	$u.val(Math.floor((0+(+ new Date()))/1000));
-	var startmode=mode;mode='todate';convert();mode=startmode;
+	$u.val(Math.floor((+new Date()) / 1000));
+	var startmode = mode; mode = 'todate'; convert(); mode = startmode;
 });
 
 jsUtils.register('rndstring', function (name, $container, $, utils){
