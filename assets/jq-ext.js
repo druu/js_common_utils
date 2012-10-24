@@ -21,7 +21,7 @@ jQuery.fn.multiVal = function (values, wrapAround) {
 	if (typeof values === "undefined") {
 		ret = [];
 		this.each(function () {
-			ret.push(this.val());
+			ret.push($(this).val());
 		});
 		return ret;
 	}

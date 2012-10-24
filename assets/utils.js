@@ -14,16 +14,16 @@ var utils = (function () {
 	fn.date.parse = function (dateStr, format, useUTC) {
 		var map = {
 				'y': 0,
-				'm': 0,
-				'd': 0,
+				'm': 1,
+				'd': 1,
 				'h': 0,
 				'i': 0,
 				's': 0
 			},
 			date, i, ret;
 		
-		date = dateStr.split(/\D/);
-		format = ((format && String(format)) || "Y-m-d H:i:s").toLowerCase().split(/[^ymdhis]/);
+		date = dateStr.replace(/^\D+|\D+$/g, '').split(/\D/);
+		format = ((format && String(format)) || "Y-m-d H:i:s").toLowerCase().replace(/[^ymdhis]/g, '').split('');
 		
 		for (i = 0; i < date.length && i < format.length; i += 1) {
 			if (typeof map[format[i]] !== "undefined") {
@@ -35,12 +35,13 @@ var utils = (function () {
 			return new Date(map.y, map.m - 1, map.d, map.h, map.i, map.s);
 		}
 		ret = new Date();
-		ret.setUTCYears(map.y);
-		ret.setUTCMonths(map.m - 1);
+		ret.setUTCFullYear(map.y);
+		ret.setUTCMonth(map.m - 1);
 		ret.setUTCDate(map.d);
 		ret.setUTCHours(map.h);
 		ret.setUTCMinutes(map.i);
 		ret.setUTCSeconds(map.s);
+		return ret;
 	};
 	fn.date.format = (function () {
 		var map = {
