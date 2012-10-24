@@ -1,50 +1,9 @@
-/** global jQuery: true */
-var jsUtils = (function (window, $) {
+var jsUtils = (function (window, $, utils) {
 	"use strict";
 	var modules = {},
 		activeModules,
-		jsUtils = {
-			fn: {
-				strPad: function (str, len, padChar) {
-					len = (len && parseInt(Math.abs(len), 10)) || 2;
-					str = String(str);
-					return (str.length >= len && str) || /*Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0")*/ this.strRepeat(padChar, len - str.length - 1) + str;
-				},
-				strRepeat: function (str, times) {
-					return Array.prototype.constructor.call(Array, parseInt(Math.abs(times), 10) + 1).join(str);
-				},
-				strShuffle: function (str) {
-					if (arguments.length === 0 || !str) { return '';}
-					var output = '', len = str.length, i = len;
-					while(i) {
-						output += str.charAt(Math.floor(Math.random() * len));
-						i -= 1;
-					}
-					return output;
-				},
-				
-				storageGet: function (key, fallback) {
-					var val;
-					try {
-						val = localStorage.getItem(String(key));
-						val = (typeof "val" === "string" && JSON.parse(val)) || fallback;
-						return val;
-					} catch (e) {
-						return fallback;
-					}
-				},
-				
-				storageSet: function (key, val) {
-					try {
-						val = JSON.stringify(val);
-						localStorage.setItem(String(key), val);
-						return true;
-					} catch (e) {
-						return false;
-					}
-				}
-			}
-		};
+		
+		jsUtils = {};
 
 
 	jsUtils.init = function () {
@@ -55,7 +14,7 @@ var jsUtils = (function (window, $) {
 
 		// get custom module activeModules from LocalStorage
 		// TODO: d&d reactiveModulesing, enabling/disabling
-		activeModules = jsUtils.fn.storageGet("jsutils-plugin-activeModules", null);
+		activeModules = utils.storage.get("jsutils-plugin-activeModules", null);
 		if (!(activeModules instanceof Array) || !activeModules.length) {
 			activeModules = [];
 			for (prop in modules) {
@@ -74,7 +33,7 @@ var jsUtils = (function (window, $) {
 			$body.append(
 				$('<section id="' + activeModules[i] + '"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
 			);
-			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, jsUtils.fn]);
+			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
 		}
 
 		// force equal container height
@@ -121,7 +80,7 @@ var jsUtils = (function (window, $) {
 	};
 
 	return jsUtils;
-}(window, jQuery));
+}(window, window.jQuery, window.utils));
 
 jsUtils.register("urlencode", function (name, $container, $, utils) {
 	"use strict";
@@ -520,7 +479,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				}
 			});
 
-			return utils.strPad(num.toString(8), 4);
+			return utils.string.pad(num.toString(8), 4);
 		},
 
 
@@ -535,7 +494,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				(/t/i.test(str.charAt(8)) ? '1' : '0') +
 				str.replace(/-|[ST]/g, '0').replace(/[^0]/g, '1'), 2).
 				toString(8);
-			return utils.strPad(str, 4);
+			return utils.string.pad(str, 4);
 		},
 
 		octal2human = function (str) {
@@ -547,7 +506,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				throw "Invalid octal";
 			}
 
-			str = utils.strPad(parseInt(str, 8).toString(2), 12);
+			str = utils.string.pad(parseInt(str, 8).toString(2), 12);
 			special = str.substring(0, 3);
 			str = str.substring(3);
 
@@ -668,46 +627,32 @@ jsUtils.register("textsort", function (name, $container, $, utils) {
 
 jsUtils.register('timestamps', function (name, $container, $, utils) {
 	"use strict";
-	var $u = $('#timestamps_u'),
-		$d = $('#timestamps_d'),
-		$m = $('#timestamps_m'),
-		$y = $('#timestamps_y'),
-		$hh = $('#timestamps_hh'),
-		$mm = $('#timestamps_mm'),
-		$ss = $('#timestamps_ss'),
-		mode = 'tostamp',
-		startmode;
-	
-	function convert () {
-		var d,
-			startmode;
+	var $singleFields = $container.find('input:not([id])'),
+		$timestamp = $('#timestamps_u'),
+		$checkbox = $('#timestamps_utc'),
+		useUTC = false,
 		
-		switch (mode) {
-			case 'tostamp':
-				d = new Date($y.val(), $m.val() - 1, $d.val(), $hh.val(), $mm.val(), $ss.val());
-				$u.val(d.getTime() / 1000);
-				break;
-			case 'todate':
-				d = new Date($u.val() * 1000);
-				$d.val(utils.strPad(d.getUTCDate()));
-				$m.val(utils.strPad(d.getUTCMonth() + 1));
-				$y.val(d.getUTCFullYear());
-				$hh.val(utils.strPad(d.getUTCHours()));
-				$mm.val(utils.strPad(d.getUTCMinutes()));
-				$ss.val(utils.strPad(d.getUTCSeconds()));
-				break;
-		}
-	}
-
-	$('#timestamps_mode').change(function () {
-		mode = $(this).val();
-		convert();
-	});
-	$('#timestamps > input').bind('keyup paste', convert);
-
-	// Initialise with current time
-	$u.val(Math.floor((+new Date()) / 1000));
-	startmode = mode; mode = 'todate'; convert(); mode = startmode;
+		stampChanged = function () {
+			var date = new Date((parseInt($timestamp.val(), 10) * 1000) || 0),
+				dateStr = utils.date.format("Y-m-d-H-i-s", date, useUTC);
+			
+			$singleFields.multiVal(dateStr.split('-'));
+		},
+		dateChanged = function () {
+			var dateString = $singleFields.multiVal().join('-'),
+				date = utils.date.parse(dateString, "Y-m-d-h-i-s", useUTC);
+			
+			$timestamp.val(parseInt(+date / 1000, 10));
+		},
+		utcChanged = function () {
+			useUTC = !!this.checked;
+			stampChanged();
+		};
+	
+	
+	$singleFields.on('input', dateChanged);
+	$timestamp.val(parseInt(+new Date() / 1000, 10)).on('input', stampChanged);
+	$checkbox.on('change', utcChanged).trigger('change');
 });
 
 jsUtils.register('rndstring', function (name, $container, $, utils){
@@ -737,10 +682,10 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 			var len = parseInt($len.val(), 10),
 				pool = getStringPool($sel.val(), $chars.val());
 				
-			$ta.val(utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length))).substring(0, len));
+			$ta.val(utils.string.shuffle(utils.string.repeat(pool, Math.ceil(len / pool.length))).substring(0, len));
 		};
 	
 	$sel.on('change', generate);
 	$len.on('input', generate);
-	$chars.on('input', generate);
+	$chars.on('input', generate).trigger('input');
 });
