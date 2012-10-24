@@ -9,6 +9,23 @@ var jsUtils = (function (window) {
 				strPad: function (str, len, padChar) {
 					return (str.length >= len) && str || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
 				},
+				strRepeat: function (str, times) {
+					var output = '';
+					while (times) {
+						output += str;
+						times -= 1;
+					}
+					return output;
+				},
+				strShuffle: function (str) {
+					if (arguments.length === 0 || !str) { return '';}
+					var output = '', len = str.length, i = len;
+					while(i) {
+						output += str.charAt(Math.floor(Math.random() * len));
+						i -= 1;
+					}
+					return output;
+				},
 				storageGet: function (key, fallback) {
 					var val;
 					try {
@@ -701,5 +718,45 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 	$u.val(Math.floor((0+(+ new Date()))/1000));
 	var startmode=mode;mode='todate';convert();mode=startmode;
 });
+
+jsUtils.register('rndstring', function (name, $container, $, utils){
+	"use strict";
+	var $ta  = $('#rndstring_ta'),
+		$sel     = $('#rndstring_sel'),
+		$chars   = $('#rndstring_c'),
+		$len     = $('#rndstring_l'),
+		$go      = $('#rndstring_go'),
+		get_strpool, output;
+
+	get_strpool = (function($chars){
+		var pool = {none:''};
+
+		pool.numeric      = "0123456789";
+		pool.alpha_low    = "abcdefghijklmnopqrstuvwxyz";
+		pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
+		pool.alphanum_low = pool.alpha_low + pool.numeric;
+		pool.alphanum     = pool.alpha     + pool.numeric;
+		pool.hex          = pool.alphanum_low.replace(/[^a-f0-9]*/g, '').toUpperCase();
+
+		return function(base){
+			return (pool[base] || '') + $chars.val();
+		};
+	}($chars));
+
+	$go.on('click', function () {
+		var len, pool, output;
+		len = parseInt($len.val(), 10);
+		pool = get_strpool($sel.val());
+
+		output = (utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length)))).substring(0, len);
+
+		$ta.val(output);
+	});
+
+
+});
+
+
+
 
 jQuery(jsUtils.init);
