@@ -209,7 +209,7 @@
 			<option value="numeric">numeric</option>
 			<option value="hex">hexadecimal</option>
 		</select>
-		<label>len: </label><input type="text" id="rndstring_l" value="16" size="3"><br>
+		<label>len: </label><input type="number" id="rndstring_l" value="16" min="1" max="65535" step="1"><br />
 		<label>chars: </label><input type="text" id="rndstring_c">
 		<button id="rndstring_go">create</button>
 	</script>
@@ -222,5 +222,6 @@
 	<script src="./assets/sha256.js"></script>
 	<script src="./assets/natsort.js"></script>
 	<script src="./main.js"></script>
+	<script>jQuery(jsUtils.init);</script>
 </body>
 </html>

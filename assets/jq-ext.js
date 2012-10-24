@@ -36,3 +36,14 @@ jQuery.fn.multiVal = function (values, wrapAround) {
 		$(this).val(values[i % values.length]);
 	});
 };
+
+
+jQuery.fn.eachLine = function (callback, trimBlankRows) {
+	var val = this.val();
+	
+	if (trimBlankRows) {
+		val = val.replace(/\r/g, '\n').replace(/\n+/g, '\n').replace(/^\n+|\n+$/g, '');
+	}
+	
+	return this.val(val.split('\n').map(callback).join('\n'));
+};

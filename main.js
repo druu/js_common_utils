@@ -6,22 +6,12 @@ var jsUtils = (function (window, $) {
 		jsUtils = {
 			fn: {
 				strPad: function (str, len, padChar) {
-					if (!len) {
-						len = 2;
-					}
+					len = (len && parseInt(Math.abs(len), 10)) || 2;
 					str = String(str);
-					return (str.length >= len && str) || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
+					return (str.length >= len && str) || /*Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0")*/ this.strRepeat(padChar, len - str.length - 1) + str;
 				},
-<<<<<<< HEAD
-				
-=======
 				strRepeat: function (str, times) {
-					var output = '';
-					while (times) {
-						output += str;
-						times -= 1;
-					}
-					return output;
+					return Array.prototype.constructor.call(Array, parseInt(Math.abs(times), 10) + 1).join(str);
 				},
 				strShuffle: function (str) {
 					if (arguments.length === 0 || !str) { return '';}
@@ -32,7 +22,7 @@ var jsUtils = (function (window, $) {
 					}
 					return output;
 				},
->>>>>>> develop
+				
 				storageGet: function (key, fallback) {
 					var val;
 					try {
@@ -78,7 +68,7 @@ var jsUtils = (function (window, $) {
 
 		// instantiate
 		for (i = 0; i < activeModules.length; i += 1) {
-			if (!(activeModules[i] in modules)) {
+			if (modules[activeModules[i]] === "undefined") {
 				continue;
 			}
 			$body.append(
@@ -137,16 +127,16 @@ jsUtils.register("urlencode", function (name, $container, $, utils) {
 	"use strict";
 	var $ta = $('#urlencode_ta');
 
-	$('#urlencode_enc').on('click', function (e) {
+	$('#urlencode_enc').on('click', function () {
 		$ta.val(encodeURIComponent($ta.val()).replace(/%20/g, '+'));
 	});
-	$('#urlencode_dec').on('click', function (e) {
+	$('#urlencode_dec').on('click', function () {
 		$ta.val(decodeURIComponent($ta.val()).replace(/\+/g, ' '));
 	});
-	$('#urlencode_esc_enc').on('click', function (e) {
+	$('#urlencode_esc_enc').on('click', function () {
 		$ta.val(window.escape($ta.val()));
 	});
-	$('#urlencode_esc_dec').on('click', function (e) {
+	$('#urlencode_esc_dec').on('click', function () {
 		$ta.val(window.unescape($ta.val()));
 	});
 });
@@ -685,11 +675,9 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 		$hh = $('#timestamps_hh'),
 		$mm = $('#timestamps_mm'),
 		$ss = $('#timestamps_ss'),
-		mode = 'tostamp';
-
-	function ps (s)  { 
-		return utils.strPad(s.toString(), 2);
-	}
+		mode = 'tostamp',
+		startmode;
+	
 	function convert () {
 		var d,
 			startmode;
@@ -719,47 +707,40 @@ jsUtils.register('timestamps', function (name, $container, $, utils) {
 
 	// Initialise with current time
 	$u.val(Math.floor((+new Date()) / 1000));
-	var startmode = mode; mode = 'todate'; convert(); mode = startmode;
+	startmode = mode; mode = 'todate'; convert(); mode = startmode;
 });
 
 jsUtils.register('rndstring', function (name, $container, $, utils){
 	"use strict";
 	var $ta  = $('#rndstring_ta'),
-		$sel     = $('#rndstring_sel'),
-		$chars   = $('#rndstring_c'),
-		$len     = $('#rndstring_l'),
-		$go      = $('#rndstring_go'),
-		get_strpool, output;
+		$sel = $('#rndstring_sel'),
+		$chars = $('#rndstring_c'),
+		$len = $('#rndstring_l'),
+		getStringPool = (function () {
+			var pool = {
+					none: '',
+					numeric: "0123456789",
+					alpha_low: "abcdefghijklmnopqrstuvwxyz",
+					hex: "ABCDEF0123456789",
+					hex_low: "abcdef0123456789"
+				};
+			
+			pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
+			pool.alphanum_low = pool.alpha_low + pool.numeric;
+			pool.alphanum     = pool.alpha     + pool.numeric;
 
-	get_strpool = (function($chars){
-		var pool = {none:''};
-
-		pool.numeric      = "0123456789";
-		pool.alpha_low    = "abcdefghijklmnopqrstuvwxyz";
-		pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
-		pool.alphanum_low = pool.alpha_low + pool.numeric;
-		pool.alphanum     = pool.alpha     + pool.numeric;
-		pool.hex          = pool.alphanum_low.replace(/[^a-f0-9]*/g, '').toUpperCase();
-
-		return function(base){
-			return (pool[base] || '') + $chars.val();
+			return function (base, extra) {
+				return (pool[base] || '') + extra;
+			};
+		}()),
+		generate = function () {
+			var len = parseInt($len.val(), 10),
+				pool = getStringPool($sel.val(), $chars.val());
+				
+			$ta.val(utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length))).substring(0, len));
 		};
-	}($chars));
-
-	$go.on('click', function () {
-		var len, pool, output;
-		len = parseInt($len.val(), 10);
-		pool = get_strpool($sel.val());
-
-		output = (utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length)))).substring(0, len);
-
-		$ta.val(output);
-	});
-
-
+	
+	$sel.on('change', generate);
+	$len.on('input', generate);
+	$chars.on('input', generate);
 });
-
-
-
-
-jQuery(jsUtils.init);
