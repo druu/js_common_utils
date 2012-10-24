@@ -178,6 +178,7 @@
 		<button id="textsort_natdesc">natural desc</button>
 	</script>
 
+	<!-- TIMESTAMPS -->
 	<script type="text/xtemplate" data-module="timestamps">
 		<h2>timestamps</h2>
 		<input type="text" id="timestamps_u" placeholder="Unix Timestamp" />
@@ -193,6 +194,24 @@
 			<option value="tostamp">Date &rarr; Unix Timestamp</option>
 			<option value="todate">Date &larr; Unix Timestamp</option>
 		</select>
+	</script>
+
+	<!-- RANDOM STRING -->
+	<script type="text/xtemplate" data-module="rndstring">
+		<h2>rnd_string</h2>
+		<textarea id="rndstring_ta"></textarea>
+		<select id="rndstring_sel">
+			<option value="none">empty base</option>
+			<option value="alpha">alphabet</option>
+			<option value="alpha_low">alphabet (lower)</option>
+			<option value="alphanum" selected>alphanumeric</option>
+			<option value="alphanum_low">alphanumeric (lower)</option>
+			<option value="numeric">numeric</option>
+			<option value="hex">hexadecimal</option>
+		</select>
+		<label>len: </label><input type="text" id="rndstring_l" value="16" size="3"><br>
+		<label>chars: </label><input type="text" id="rndstring_c">
+		<button id="rndstring_go">create</button>
 	</script>
 
 	<script src="./assets/jquery182.js"></script>
