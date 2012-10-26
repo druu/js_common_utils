@@ -11,7 +11,7 @@ var jsUtils = (function (window, $, utils) {
 			prop,
 			i,
 			$body = $('body'),
-			$content = $('<div id="content" class="container-fluid" />');
+			$content = $('#content');
 
 		// get custom module activeModules from LocalStorage
 		// TODO: d&d reactiveModulesing, enabling/disabling
@@ -39,7 +39,7 @@ var jsUtils = (function (window, $, utils) {
 
 			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
 		}
-		$body.append( $content );
+		//$body.append( $content );
 
 		// force equal container height
 		$sections = $('div.util');
@@ -689,8 +689,10 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 				
 			$ta.val(utils.string.shuffle(utils.string.repeat(pool, Math.ceil(len / pool.length))).substring(0, len));
 		};
-	
+
 	$sel.on('change', generate);
 	$len.on('input', generate);
 	$chars.on('input', generate).trigger('input');
 });
+
+jQuery(jsUtils.init);

@@ -6,6 +6,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Utilities</title>
 	<link rel="stylesheet" href="./assets/css/style.css" />
+	<style type="text/css">
+
+	</style>
 </head>
 <body>
 
@@ -130,11 +133,11 @@
 		</table>
 		<label>octal: </label>
 		<input id="chmod_result_oct" value="0000" maxlength="4">
-		<input id="chmod_update_oct" type="button" value="Update">
+		<button id="chmod_update_oct">Update</button>
 		<br>
 		<label>human: </label>
 		<input id="chmod_result_hum" value="---------" maxlength="9">
-		<input id="chmod_update_hum" type="button" value="Update">
+		<button id="chmod_update_hum">Update</button>
 	</script>
 
 	<!-- CHMOD 2 -->
@@ -238,10 +241,15 @@
 		<button id="rndstring_go">create</button>
 	</script>
 
+	<div id="content" class="container-fluid" />
+
 	<div class="container-fluid"><div class="row-fluid"  id="content"></div></div>
 
 	<script src="./assets/js/jquery/jquery182.js"></script>
 	<script src="./assets/js/jquery/jq-ext.js"></script>
+	
+	<script src="./assets/js/bootstrap/bootstrap.min.js"></script>
+	
 	<script src="./assets/js/3rd-party/base64.js"></script>
 	<script src="./assets/js/3rd-party/md5.js"></script>
 	<script src="./assets/js/3rd-party/sha1.js"></script>
@@ -250,6 +258,6 @@
 	
 	<script src="./assets/js/application/utils.js"></script>
 	<script src="./assets/js/application/main.js"></script>
-	<script>jQuery(jsUtils.init);</script>
+	
 </body>
 </html>
