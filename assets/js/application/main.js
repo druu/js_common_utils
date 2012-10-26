@@ -7,10 +7,11 @@ var jsUtils = (function (window, $, utils) {
 
 
 	jsUtils.init = function () {
-		var $sections,
+		var $sections, $row,
 			prop,
 			i,
-			$body = $('body');
+			$body = $('body'),
+			$content = $('<div id="content" class="container-fluid" />');
 
 		// get custom module activeModules from LocalStorage
 		// TODO: d&d reactiveModulesing, enabling/disabling
@@ -27,17 +28,21 @@ var jsUtils = (function (window, $, utils) {
 
 		// instantiate
 		for (i = 0; i < activeModules.length; i += 1) {
+			
 			if (modules[activeModules[i]] === "undefined") {
 				continue;
 			}
-			$body.append(
-				$('<section id="' + activeModules[i] + '"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
+
+			$content.append(
+				$('<div id="' + activeModules[i] + '" class="util span3"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
 			);
+
 			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
 		}
+		$body.append( $content );
 
 		// force equal container height
-		$sections = $('section');
+		$sections = $('div.util');
 		$sections.height(Math.max.apply(Math, $sections.map(function () { return $(this).height(); })));
 
 		// search field

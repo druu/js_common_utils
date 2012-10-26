@@ -18,10 +18,12 @@
 			</div>
 		</div>
 	</div>
-
+	
+	<!--
 	<div id="topbar">
 		<input type="seach" id="topbar_search" placeholder=" filter..." />
 	</div>
+	-->
 
 	<!-- URLENCODING -->
 	<script type="text/xtemplate" data-module="urlencode">
@@ -193,22 +195,36 @@
 	<!-- TIMESTAMPS -->
 	<script type="text/xtemplate" data-module="timestamps">
 		<h2>timestamps</h2>
-		<input id="timestamps_u" placeholder="Unix Timestamp" />
-		<br />
-		<input size="4" placeholder="YYYY" />
-		<input size="2" placeholder="MM" />
-		<input size="2" placeholder="DD" />
-		<input size="2" placeholder="HH" />
-		<input size="2" placeholder="MM" />
-		<input size="2" placeholder="SS" /><br />
-		<label for="timestamps_utc">UTC</label><input type="checkbox" id="timestamps_utc" checked="checked" />
+		<form class="form form-inline">
+			<div class="control-group">
+				<div class="controls">
+					<input id="timestamps_u" class="span4" placeholder="Unix Timestamp" />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls"
+					<input size="4" placeholder="YYYY" class="span1"  />
+					<input size="2" placeholder="MM" class="span1" />
+					<input size="2" placeholder="DD" class="span1"  />
+					<input size="2" placeholder="HH" class="span1"  />
+					<input size="2" placeholder="MM" class="span1"  />
+					<input size="2" placeholder="SS" class="span1"  />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<label for="timestamps_utc">UTC</label>
+					<input type="checkbox" id="timestamps_utc" checked="checked" />
+				</div>
+			</div>
+		</form>
 	</script>
 
 	<!-- RANDOM STRING -->
 	<script type="text/xtemplate" data-module="rndstring">
 		<h2>rnd_string</h2>
 		<textarea id="rndstring_ta"></textarea>
-		<select id="rndstring_sel">
+		<select id="rndstring_sel" class="span2">
 			<option value="none">empty base</option>
 			<option value="alpha">alphabet</option>
 			<option value="alpha_low">alphabet (lower)</option>
@@ -217,10 +233,12 @@
 			<option value="numeric">numeric</option>
 			<option value="hex">hexadecimal</option>
 		</select>
-		<label>len: </label><input type="number" id="rndstring_l" value="16" min="1" max="65535" step="1"><br />
+		<label>len: </label><input type="number" id="rndstring_l" value="16" min="1" max="65535" step="1" class="span2"><br />
 		<label>chars: </label><input id="rndstring_c">
 		<button id="rndstring_go">create</button>
 	</script>
+
+	<div class="container-fluid"><div class="row-fluid"  id="content"></div></div>
 
 	<script src="./assets/js/jquery/jquery182.js"></script>
 	<script src="./assets/js/jquery/jq-ext.js"></script>
