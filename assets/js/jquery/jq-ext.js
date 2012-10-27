@@ -1,13 +1,3 @@
-jQuery.single = (function ($) {
-	var $elem = $([]);
-		
-	return function (elem) {
-		$elem[0] = elem[0] || elem;
-		return $elem;
-	};
-}(jQuery));
-
-
 /**
  * wrapAround true:
  * [ ][ ][ ][ ][ ] + Arr(1,2,3) --> [1][2][3][ ][ ]
@@ -26,7 +16,7 @@ jQuery.fn.multiVal = function (values, wrapAround) {
 		return ret;
 	}
 	
-	if (!(values instanceof Array)) {
+	if (!Array.isArray(values)) {
 		this.val(String(values));
 		return this;
 	}
@@ -35,15 +25,4 @@ jQuery.fn.multiVal = function (values, wrapAround) {
 	return this.each(function (i) {
 		$(this).val(values[i % values.length]);
 	});
-};
-
-
-jQuery.fn.eachLine = function (callback, trimBlankRows) {
-	var val = this.val();
-	
-	if (trimBlankRows) {
-		val = val.replace(/\r/g, '\n').replace(/\n+/g, '\n').replace(/^\n+|\n+$/g, '');
-	}
-	
-	return this.val(val.split('\n').map(callback).join('\n'));
 };

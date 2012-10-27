@@ -130,30 +130,8 @@
         return string;
     };
 
-    // standard sha256 implementation: var x = $.sha256(value);
-    // standard sha266hmac implementation: varx = $.sha256hmac(value1, value2);
-    $.extend({
-        sha256 : function(string){
-            string = prep(string);
-            return binb2hex(core_sha256(str2binb(string),string.length * chrsz));
-        },
-        sha256hmac : function(key, data){
-            key = prep(key);
-            data = prep(data);
-            return binb2hex(core_hmac_sha256(key, data));
-        },
-        sha256config : function(bits){
-            chrsz = parseInt(bits, 10) || 8;
-        }
-    });
-    // alternative sha256 implementation: var x = value.sha256();
-    $.fn.sha256 = function (bits) {
-        // change bits
-        $.sha256config(bits);
-        var string = prep($(this).val());
-        var val = $.sha256(string);
-        // reset bits, this was a one-time operation
-        $.sha256config(8);
-        return val;
-    };
+    window.sha256 = function (string) {
+		string = prep(String(string));
+		return binb2hex(core_sha256(str2binb(string),string.length * chrsz));
+	};
 })(jQuery);
