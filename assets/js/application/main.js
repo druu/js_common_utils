@@ -695,4 +695,12 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 	$chars.on('input', generate).trigger('input');
 });
 
+jQuery(function($){
+	$('body').on('click', 'h2', function(){
+		var $container = $(this).parent();
+		$container.toggleClass('fullsize');
+		$container.siblings().toggle(0, 'hide');
+	});
+});
+
 jQuery(jsUtils.init);
