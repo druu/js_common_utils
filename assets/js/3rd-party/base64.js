@@ -1,3 +1,6 @@
+/*!
+ * TODO: Atrribution, License
+ */
 var base64 = (function (obj) {
   "use strict";
 

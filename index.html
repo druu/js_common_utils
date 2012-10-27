@@ -1,15 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Utilities</title>
-	<link rel="stylesheet" href="./style.css" />
+	<link rel="stylesheet" href="./assets/css/style.css" />
+	<style type="text/css">
+
+	</style>
 </head>
 <body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<form class="navbar-form ">
+					<input type="seach" id="topbar_search" placeholder=" filter..." />
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<!--
 	<div id="topbar">
 		<input type="seach" id="topbar_search" placeholder=" filter..." />
 	</div>
+	-->
 
 	<!-- URLENCODING -->
 	<script type="text/xtemplate" data-module="urlencode">
@@ -39,8 +56,8 @@
 		<textarea class="half"></textarea>
 		<textarea></textarea>
 		<br class="clear">
-		<input type="text" id="replace_from" /> &#187;
-		<input type="text" id="replace_to" />
+		<input id="replace_from" /> &#187;
+		<input id="replace_to" />
 	</script>
 
 	<!-- BASE64 -->
@@ -64,7 +81,7 @@
 	<script type="text/xtemplate" data-module="substr_count">
 		<h2>substr_count</h2>
 		<textarea id="substr_count_ta"></textarea>
-		<input type="text" id="substr_count_tf" />
+		<input id="substr_count_tf" />
 		<label for="substr_count_cb" title="Case-insensitive">CI</label> <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
 		<label>Count: <span></span></label>
 	</script>
@@ -116,11 +133,11 @@
 		</table>
 		<label>octal: </label>
 		<input id="chmod_result_oct" value="0000" maxlength="4">
-		<input id="chmod_update_oct" type="button" value="Update">
+		<button id="chmod_update_oct">Update</button>
 		<br>
 		<label>human: </label>
 		<input id="chmod_result_hum" value="---------" maxlength="9">
-		<input id="chmod_update_hum" type="button" value="Update">
+		<button id="chmod_update_hum">Update</button>
 	</script>
 
 	<!-- CHMOD 2 -->
@@ -181,26 +198,36 @@
 	<!-- TIMESTAMPS -->
 	<script type="text/xtemplate" data-module="timestamps">
 		<h2>timestamps</h2>
-		<input type="text" id="timestamps_u" placeholder="Unix Timestamp" />
-		<br/>
-		<input type="text" id="timestamps_d" size="2" placeholder="DD" />
-		<input type="text" id="timestamps_m" size="2" placeholder="MM" />
-		<input type="text" id="timestamps_y" size="4" placeholder="YYYY" />
-		<input type="text" id="timestamps_hh" size="2" placeholder="HH" />
-		<input type="text" id="timestamps_mm" size="2" placeholder="MM" />
-		<input type="text" id="timestamps_ss" size="2" placeholder="SS" />
-		<br/>
-		<select	id="timestamps_mode">
-			<option value="tostamp">Date &rarr; Unix Timestamp</option>
-			<option value="todate">Date &larr; Unix Timestamp</option>
-		</select>
+		<form class="form form-inline">
+			<div class="control-group">
+				<div class="controls">
+					<input id="timestamps_u" class="span4" placeholder="Unix Timestamp" />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls"
+					<input size="4" placeholder="YYYY" class="span1"  />
+					<input size="2" placeholder="MM" class="span1" />
+					<input size="2" placeholder="DD" class="span1"  />
+					<input size="2" placeholder="HH" class="span1"  />
+					<input size="2" placeholder="MM" class="span1"  />
+					<input size="2" placeholder="SS" class="span1"  />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<label for="timestamps_utc">UTC</label>
+					<input type="checkbox" id="timestamps_utc" checked="checked" />
+				</div>
+			</div>
+		</form>
 	</script>
 
 	<!-- RANDOM STRING -->
 	<script type="text/xtemplate" data-module="rndstring">
 		<h2>rnd_string</h2>
 		<textarea id="rndstring_ta"></textarea>
-		<select id="rndstring_sel">
+		<select id="rndstring_sel" class="span2">
 			<option value="none">empty base</option>
 			<option value="alpha">alphabet</option>
 			<option value="alpha_low">alphabet (lower)</option>
@@ -209,17 +236,27 @@
 			<option value="numeric">numeric</option>
 			<option value="hex">hexadecimal</option>
 		</select>
-		<label>len: </label><input type="text" id="rndstring_l" value="16" size="3"><br>
-		<label>chars: </label><input type="text" id="rndstring_c">
+		<label>len: </label><input type="number" id="rndstring_l" value="16" min="1" max="65535" step="1" class="span2"><br />
+		<label>chars: </label><input id="rndstring_c">
 		<button id="rndstring_go">create</button>
 	</script>
 
-	<script src="./assets/jquery182.js"></script>
-	<script src="./assets/base64.js"></script>
-	<script src="./assets/md5.js"></script>
-	<script src="./assets/sha1.js"></script>
-	<script src="./assets/sha256.js"></script>
-	<script src="./assets/natsort.js"></script>
-	<script src="./main.js"></script>
+	<div id="content" class="container-fluid"/></div>
+
+
+	<script src="./assets/js/jquery/jquery182.js"></script>
+	<script src="./assets/js/jquery/jq-ext.js"></script>
+	
+	<script src="./assets/js/bootstrap/bootstrap.min.js"></script>
+	
+	<script src="./assets/js/3rd-party/base64.js"></script>
+	<script src="./assets/js/3rd-party/md5.js"></script>
+	<script src="./assets/js/3rd-party/sha1.js"></script>
+	<script src="./assets/js/3rd-party/sha256.js"></script>
+	<script src="./assets/js/3rd-party/natsort.js"></script>
+	
+	<script src="./assets/js/application/utils.js"></script>
+	<script src="./assets/js/application/main.js"></script>
+	
 </body>
 </html>

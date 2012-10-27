@@ -1,1 +1,2 @@
-# JS COMMON UTILS
+# Common JavaScript Utilities
+![image](http://i.imgur.com/qaRVe.png)

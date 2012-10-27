@@ -1,0 +1,127 @@
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+
+button {
+	.btn;
+	.btn-small;
+}
+
+
+.util {
+	position: relative;
+	border: 3px solid black;
+	padding: 20px 5px 5px 5px;
+	width: 24.5%; 
+	display: inline-block;
+	float: left;
+	min-height: 128px;
+	min-width: 400px;
+	margin: 30px 2px 0;
+	//margin-top: 30px;
+	box-sizing : border-box;
+
+	&.fullsize {
+		width: 99.5%;
+	}
+
+	h2 {
+		position: absolute;
+		padding: 0px 10px;
+		top: -32px;
+		left: 15px;
+		width: auto;
+		display: inline-block;
+		border: 3px solid black;
+		background: white;
+	}
+
+}
+
+
+textarea {
+	width: 95%;
+	display: block;
+	height: 100px;
+}
+textarea.half {
+	width: 45%;
+	float: left;
+}
+textarea.half + textarea {
+	width: 45%;
+	float: right;
+}
+button, select, input, textarea {
+	background-color: #efefef;
+	border: 1px solid black;
+	font-weight: bold;
+}
+br.clear {
+	clear: both;
+}
+
+label {
+	display: inline-block;
+	margin-right:10px;
+}
+label[for] {
+	margin-right:0;
+	cursor: pointer;
+}
+table {
+	width: 100%;
+}
+td:hover input[type="checkbox"] {
+	outline: 4px solid rgba(255, 168, 0, 0.5)!important;
+}
+
+.control {
+	
+}
+
+.navbar {
+	text-align: center;
+}
+
+.navbar input {
+	width: 50%;
+	text-indent: 10px;
+	// display: inline-block;
+	text-align: left;
+	font-size: 18px;
+	line-height: 20px
+}
+
+::-webkit-input-placeholder  { 
+	padding-top: 3px;
+	text-indent: 0px;
+	text-align: left;
+	font-size: 18px;
+	line-height: 20px;
+}
+input:-moz-placeholder { 
+	padding-top: 3px;
+	text-indent: 0px;
+	text-align: left;
+	font-size: 18px;
+	line-height: 20px;
+}
+
+
+// some responsiveness
+@media (max-width: 1650px) {
+	.util {
+		width: 32.5%;
+	}
+}
+@media (max-width: 1250px) {
+	.util {
+		width: 49.5%;
+	}
+}
+@media (max-width: 850px) {
+	.util {
+		width: 99.5%;
+	}
+}

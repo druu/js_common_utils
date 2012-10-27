@@ -1,66 +1,21 @@
-/** global jQuery: true */
-var jsUtils = (function (window) {
+var jsUtils = (function (window, $, utils) {
 	"use strict";
-	var $,
-		modules = {},
+	var modules = {},
 		activeModules,
-		jsUtils = {
-			fn: {
-				strPad: function (str, len, padChar) {
-					return (str.length >= len) && str || Array.prototype.constructor.call(Array, len - str.length + 1).join(padChar || "0") + str;
-				},
-				strRepeat: function (str, times) {
-					var output = '';
-					while (times) {
-						output += str;
-						times -= 1;
-					}
-					return output;
-				},
-				strShuffle: function (str) {
-					if (arguments.length === 0 || !str) { return '';}
-					var output = '', len = str.length, i = len;
-					while(i) {
-						output += str.charAt(Math.floor(Math.random() * len));
-						i -= 1;
-					}
-					return output;
-				},
-				storageGet: function (key, fallback) {
-					var val;
-					try {
-						val = localStorage.getItem(String(key));
-						val = JSON.parse(val);
-						return val;
-					} catch (e) {
-						return fallback;
-					}
-				},
-				storageSet: function (key, val) {
-					try {
-						val = JSON.stringify(val);
-						localStorage.setItem(String(key), val);
-						return true;
-					} catch (e) {
-						return false;
-					}
-				}
-			}
-		};
+		
+		jsUtils = {};
 
 
 	jsUtils.init = function () {
-		var $sections,
+		var $sections, $row,
 			prop,
 			i,
-			$body;
-
-		$ = window.jQuery;
-		$body = $('body');
+			$body = $('body'),
+			$content = $('#content');
 
 		// get custom module activeModules from LocalStorage
 		// TODO: d&d reactiveModulesing, enabling/disabling
-		activeModules = jsUtils.fn.storageGet("jsutils-plugin-activeModules", null);
+		activeModules = utils.storage.get("jsutils-plugin-activeModules", null);
 		if (!(activeModules instanceof Array) || !activeModules.length) {
 			activeModules = [];
 			for (prop in modules) {
@@ -73,22 +28,27 @@ var jsUtils = (function (window) {
 
 		// instantiate
 		for (i = 0; i < activeModules.length; i += 1) {
-			if (!(activeModules[i] in modules)) {
+			
+			if (modules[activeModules[i]] === "undefined") {
 				continue;
 			}
-			$body.append(
-				$('<section id="' + activeModules[i] + '"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
+
+			$content.append(
+				$('<div id="' + activeModules[i] + '" class="util span3"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
 			);
-			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, jsUtils.fn]);
+
+			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
 		}
+		//$body.append( $content );
 
 		// force equal container height
-		$sections = $('section');
+		$sections = $('div.util');
 		$sections.height(Math.max.apply(Math, $sections.map(function () { return $(this).height(); })));
 
 		// search field
 		$(document).on('keyup', function (e) {
 			if ((e.charCode || e.keyCode) === 27) {
+				$('div.util').removeClass('fullsize').show(0);
 				$('#topbar_search').focus();
 			}
 		});
@@ -106,7 +66,7 @@ var jsUtils = (function (window) {
 			if (!keywords.length) {
 				keywords = ".";
 			}
-			keywords = keywords.split(/\s+/).map(function (word,a,i) { return new RegExp(word); });
+			keywords = keywords.split(/\s+/).map(function (word) { return new RegExp(word); });
 
 			myfacewhenjshaslabels: for (m = 0; m < activeModules.length; m += 1) {
 				for (k = 0; k < keywords.length; k += 1) {
@@ -126,22 +86,22 @@ var jsUtils = (function (window) {
 	};
 
 	return jsUtils;
-}(window));
+}(window, window.jQuery, window.utils));
 
 jsUtils.register("urlencode", function (name, $container, $, utils) {
 	"use strict";
 	var $ta = $('#urlencode_ta');
 
-	$('#urlencode_enc').on('click', function (e) {
+	$('#urlencode_enc').on('click', function () {
 		$ta.val(encodeURIComponent($ta.val()).replace(/%20/g, '+'));
 	});
-	$('#urlencode_dec').on('click', function (e) {
+	$('#urlencode_dec').on('click', function () {
 		$ta.val(decodeURIComponent($ta.val()).replace(/\+/g, ' '));
 	});
-	$('#urlencode_esc_enc').on('click', function (e) {
+	$('#urlencode_esc_enc').on('click', function () {
 		$ta.val(window.escape($ta.val()));
 	});
-	$('#urlencode_esc_dec').on('click', function (e) {
+	$('#urlencode_esc_dec').on('click', function () {
 		$ta.val(window.unescape($ta.val()));
 	});
 });
@@ -432,14 +392,8 @@ jsUtils.register("chmod", function (name, $container, $, utils) {
 			sticky       = '',
 			special_case = false,
 			checked      = false,
-			v            = {
-				'r' : 4,
-				'w' : 2,
-				'x' : 1, 's' : 1, 'S' : 1, 't' : 1, 'T' : 1,
-				'-' : 0
-			},
 			v_input      = [4,2,1],
-			m, n, i, c, sb, sgid, suid;
+			m, n, i, c;
 
 		if (len !== 9) {
 			val = replaceAt(0, val, '---------');
@@ -531,7 +485,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				}
 			});
 
-			return utils.strPad(num.toString(8), 4);
+			return utils.string.pad(num.toString(8), 4);
 		},
 
 
@@ -546,7 +500,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				(/t/i.test(str.charAt(8)) ? '1' : '0') +
 				str.replace(/-|[ST]/g, '0').replace(/[^0]/g, '1'), 2).
 				toString(8);
-			return utils.strPad(str, 4);
+			return utils.string.pad(str, 4);
 		},
 
 		octal2human = function (str) {
@@ -558,7 +512,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				throw "Invalid octal";
 			}
 
-			str = utils.strPad(parseInt(str, 8).toString(2), 12);
+			str = utils.string.pad(parseInt(str, 8).toString(2), 12);
 			special = str.substring(0, 3);
 			str = str.substring(3);
 
@@ -678,85 +632,76 @@ jsUtils.register("textsort", function (name, $container, $, utils) {
 });
 
 jsUtils.register('timestamps', function (name, $container, $, utils) {
-	var $u = $('#timestamps_u'),
-		$d = $('#timestamps_d'),
-		$m = $('#timestamps_m'),
-		$y = $('#timestamps_y'),
-		$hh = $('#timestamps_hh'),
-		$mm = $('#timestamps_mm'),
-		$ss = $('#timestamps_ss'),
-		mode = 'tostamp';
-
-	function ps(s){return utils.strPad(s.toString(),2);}
-	function convert() {
-		var d;
-		switch (mode) {
-			case 'tostamp':
-				d = new Date($y.val(), $m.val()-1, $d.val(), $hh.val(), $mm.val(), $ss.val());
-				$u.val(d.getTime()/1000);
-				break;
-			case 'todate':
-				d = new Date($u.val()*1000);
-				$d.val(ps(d.getDate()));
-				$m.val(ps(d.getMonth()+1));
-				$y.val(d.getFullYear());
-				$hh.val(ps(d.getHours()));
-				$mm.val(ps(d.getMinutes()));
-				$ss.val(ps(d.getSeconds()));
-				break;
-		}
-	}
-
-	$('#timestamps_mode').change(function () {
-		mode = $(this).val();
-		console.log(mode);
-		convert();
-	});
-	$('#timestamps > input').bind('keyup paste', convert);
-
-	// Initialise with current time
-	$u.val(Math.floor((0+(+ new Date()))/1000));
-	var startmode=mode;mode='todate';convert();mode=startmode;
+	"use strict";
+	var $singleFields = $container.find('input:not([id])'),
+		$timestamp = $('#timestamps_u'),
+		$checkbox = $('#timestamps_utc'),
+		useUTC = false,
+		
+		stampChanged = function () {
+			var date = new Date((parseInt($timestamp.val(), 10) * 1000) || 0),
+				dateStr = utils.date.format("Y-m-d-H-i-s", date, useUTC);
+			
+			$singleFields.multiVal(dateStr.split('-'));
+		},
+		dateChanged = function () {
+			var dateString = $singleFields.multiVal().join('-'),
+				date = utils.date.parse(dateString, "Y-m-d-h-i-s", useUTC);
+			
+			$timestamp.val(parseInt(+date / 1000, 10));
+		},
+		utcChanged = function () {
+			useUTC = !!this.checked;
+			stampChanged();
+		};
+	
+	
+	$singleFields.on('input', dateChanged);
+	$timestamp.val(parseInt(+new Date() / 1000, 10)).on('input', stampChanged);
+	$checkbox.on('change', utcChanged).trigger('change');
 });
 
 jsUtils.register('rndstring', function (name, $container, $, utils){
 	"use strict";
 	var $ta  = $('#rndstring_ta'),
-		$sel     = $('#rndstring_sel'),
-		$chars   = $('#rndstring_c'),
-		$len     = $('#rndstring_l'),
-		$go      = $('#rndstring_go'),
-		get_strpool, output;
+		$sel = $('#rndstring_sel'),
+		$chars = $('#rndstring_c'),
+		$len = $('#rndstring_l'),
+		getStringPool = (function () {
+			var pool = {
+					none: '',
+					numeric: "0123456789",
+					alpha_low: "abcdefghijklmnopqrstuvwxyz",
+					hex: "ABCDEF0123456789",
+					hex_low: "abcdef0123456789"
+				};
+			
+			pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
+			pool.alphanum_low = pool.alpha_low + pool.numeric;
+			pool.alphanum     = pool.alpha     + pool.numeric;
 
-	get_strpool = (function($chars){
-		var pool = {none:''};
-
-		pool.numeric      = "0123456789";
-		pool.alpha_low    = "abcdefghijklmnopqrstuvwxyz";
-		pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
-		pool.alphanum_low = pool.alpha_low + pool.numeric;
-		pool.alphanum     = pool.alpha     + pool.numeric;
-		pool.hex          = pool.alphanum_low.replace(/[^a-f0-9]*/g, '').toUpperCase();
-
-		return function(base){
-			return (pool[base] || '') + $chars.val();
+			return function (base, extra) {
+				return (pool[base] || '') + extra;
+			};
+		}()),
+		generate = function () {
+			var len = parseInt($len.val(), 10),
+				pool = getStringPool($sel.val(), $chars.val());
+				
+			$ta.val(utils.string.shuffle(utils.string.repeat(pool, Math.ceil(len / pool.length))).substring(0, len));
 		};
-	}($chars));
 
-	$go.on('click', function () {
-		var len, pool, output;
-		len = parseInt($len.val(), 10);
-		pool = get_strpool($sel.val());
-
-		output = (utils.strShuffle(utils.strRepeat(pool, Math.ceil(len / pool.length)))).substring(0, len);
-
-		$ta.val(output);
-	});
-
-
+	$sel.on('change', generate);
+	$len.on('input', generate);
+	$chars.on('input', generate).trigger('input');
 });
 
-
-
+jQuery(function($){
+	$('body').on('click', 'h2', function(){
+		var $container = $(this).parent();
+		$container.toggleClass('fullsize');
+		$container.siblings().toggle(0, 'hide');
+	});
+});
 
 jQuery(jsUtils.init);
