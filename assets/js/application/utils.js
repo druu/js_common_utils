@@ -1,4 +1,4 @@
-(function () {
+(function (window, $) {
 	/**
 	 * Helper function to define immutable, non-enumerable functions on builtin prototypes.
 	 * If the target object is an Array, it will be traversed recursively and the method added to all its members.
@@ -107,6 +107,11 @@
 	def(Number.prototype, "round", function (n) {
 		return this.toFixed((n || 0).toInt().abs()).toNumber();
 	});
+	def(Number.prototype, "constrain", function (min, max) {
+		min = min === null || typeof min === "undefined" ? -Infinity : min.toNumber();
+		max = max === null || typeof max === "undefined" ? Infinity : max.toNumber();
+		return Math.min(max, Math.max(min, this));
+	});
 	
 	
 	
@@ -178,6 +183,19 @@
 	});
 	def(String.prototype, "contains", function (needle) {
 		return this.indexOf(needle) > -1;
+	});
+	def(String.prototype, "nsplit", function (n) {
+		var i, ret = [];
+		n = Math.max(n || 1, 1);
+		
+		if (n === 1) {
+			return this.split('');
+		}
+		
+		for (i = 0; i < this.length; i += n) {
+			ret.push(this.substring(i, i + n));
+		}
+		return ret;
 	});
 	
 	
@@ -320,7 +338,7 @@
 		var val;
 		try {
 			val = this.getItem(String(key));
-			val = (typeof "val" === "string" && JSON.parse(val)) || fallback;
+			val = typeof "val" === "string" ? JSON.parse(val) : fallback;
 			return val;
 		} catch (e) {
 			return fallback;
@@ -335,4 +353,11 @@
 			return false;
 		}
 	});
-}(window));
+	def(window.localStorage, "persist", function (element, key, defaultValue) {
+		$(element).val(window.localStorage.xget(key, defaultValue));
+		
+		$(window).on('beforeunload', function () {
+			window.localStorage.xset(key, $(element).val());
+		});
+	});
+}(window, jQuery));

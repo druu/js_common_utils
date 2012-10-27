@@ -9,7 +9,6 @@ var jsUtils = (function (window, $) {
 
 	jsUtils.init = function () {
 		var $sections,
-			prop,
 			i,
 			$content = $('#content'),
 			$search = $('#topbar_search');
@@ -123,7 +122,7 @@ jsUtils.register("strlen", function ($container, $) {
 		mode = $(this).val();
 		measure();
 	});
-	$ta.bind('keyup paste click blur focus', measure);
+	$ta.bind('input', measure);
 	measure();
 });
 
@@ -145,7 +144,7 @@ jsUtils.register("replace", function ($container, $) {
 		$ta_to.val(error ? "ERROR: " + error : "");
 	}
 
-	$tf_from.bind('keyup keydown blur paste', function () {
+	$tf_from.bind('input', function () {
 		var val = $tf_from.val();
 		error = "";
 		if (val.length) {
@@ -160,11 +159,11 @@ jsUtils.register("replace", function ($container, $) {
 		regex = null;
 		replace();
 	});
-	$tf_to.bind('keyup blur paste', function () {
+	$tf_to.bind('input', function () {
 		replacement = $tf_to.val() || "";
 		replace();
 	});
-	$ta_from.bind('keyup blur paste', replace);
+	$ta_from.bind('input', replace);
 });
 
 jsUtils.register("base64", function ($container, $) {
@@ -230,8 +229,8 @@ jsUtils.register("substr_count", function ($container, $) {
 		ci = $cb.is(':checked');
 		recount();
 	});
-	$tf.bind('keyup blur paste', recount);
-	$ta.bind('keyup blur paste', recount);
+	$tf.bind('input', recount);
+	$ta.bind('input', recount);
 	recount();
 });
 
@@ -346,8 +345,8 @@ jsUtils.register("chmod", function ($container, $) {
 	// re-order checkbox collection from "u-g-o-special" to "special-u-g-o"
 	$all_cb = $.merge($all_cb.slice(9), $all_cb.slice(0, 9));
 
-	$('#chmod_result_oct').on('keyup blur', octalTrigger);
-	$('#chmod_result_hum').on('keyup blur', humanTrigger);
+	$('#chmod_result_oct').on('input', octalTrigger);
+	$('#chmod_result_hum').on('input', humanTrigger);
 	$container.
 		find('table').
 		on('change', 'input:checkbox', checkboxTrigger).
@@ -399,7 +398,7 @@ jsUtils.register("textsort", function ($container, $) {
 	});
 });
 
-jsUtils.register('timestamps', function ($container, $) {
+jsUtils.register("timestamps", function ($container, $) {
 	"use strict";
 	var $singleFields = $container.find('input:not([id])'),
 		$timestamp = $('#timestamps_u'),
@@ -428,7 +427,7 @@ jsUtils.register('timestamps', function ($container, $) {
 	$checkbox.on('change', utcChanged).trigger('change');
 });
 
-jsUtils.register('rndstring', function ($container, $){
+jsUtils.register("rndstring", function ($container, $){
 	"use strict";
 	var $ta  = $('#rndstring_ta'),
 		$sel = $('#rndstring_sel'),
@@ -461,6 +460,118 @@ jsUtils.register('rndstring', function ($container, $){
 	$sel.on('change', generate);
 	$len.on('input', generate);
 	$chars.on('input', generate).trigger('input');
+});
+
+jsUtils.register("hvm", function ($container, $) {
+	/** Original HVM JS implementation by Adum - www.hacker.org */
+	var MAX_CYCLES  = 100000,
+		MEMORY_SIZE = 16384,
+		memory_field = document.getElementById('hvm_mem'),
+		operandStack,
+		callStack,
+		programCounter,
+		code,
+		memory = Array.prototype.constructor.call(MEMORY_SIZE),
+		output = "",
+		stackPush = function (v) {
+			if (!isFinite(v)) {
+				throw "illegal value";
+			}
+			if (v > 2147483647 || v < -2147483648) {
+				throw "integer overflow";
+			}
+			operandStack.push(v);
+		},
+		stackPop = function () {
+			if (!operandStack.length) {
+				throw "stack underflow";
+			}
+			return operandStack.pop();
+		},
+		instructions = {
+			' ': function () {},
+			'0': stackPush.bind(this, 0),
+			'1': stackPush.bind(this, 1),
+			'2': stackPush.bind(this, 2),
+			'3': stackPush.bind(this, 3),
+			'4': stackPush.bind(this, 4),
+			'5': stackPush.bind(this, 5),
+			'6': stackPush.bind(this, 6),
+			'7': stackPush.bind(this, 7),
+			'8': stackPush.bind(this, 8),
+			'9': stackPush.bind(this, 9),
+			'+': function() { stackPush(stackPop() + stackPop()); },
+			'-': function() { var a = stackPop(), b = stackPop(); stackPush(b - a); },
+			'*': function() { stackPush(stackPop() * stackPop()); },
+			'/': function() { var a = stackPop(), b = stackPop(); stackPush(Math.floor(b / a)); },
+			'p': function() { output += stackPop(); },
+			'P': function() { output += String.fromCharCode(stackPop() & 0x7F); },
+			':': function() { var a = stackPop(), b = stackPop(); if (b < a) { stackPush(-1); } else if (b === a) { stackPush(0); } else { stackPush(1); }},
+			'g': function() { programCounter += stackPop(); },
+			'?': function() { var offset = stackPop(); if (stackPop() === 0) { programCounter += offset; }},
+			'c': function() { callStack.push(programCounter); programCounter = stackPop(); },
+			'$': function() { if (!callStack.length) { throw "call stack underflow"; } programCounter = callStack.pop(); },
+			'<': function() { var addr = stackPop(); if (addr < 0 || addr >= memory.length) { throw 'memory read access violation @' + addr; } stackPush(memory[addr]); },
+			'>': function() { var addr = stackPop(); if (addr < 0 || addr >= memory.length) { throw 'memory write access violation @' + addr; } memory[addr] = stackPop(); },
+			'^': function() { var i = stackPop(); stackPush(operandStack[operandStack.length-i-1]); },
+			'v': function() { var i = stackPop(), v = operandStack.splice(operandStack.length - i - 1, 1); stackPush(v[0]); },
+			'd': stackPop.bind(this),
+			'!': function() { programCounter = code.length; }
+		},
+		run = function () {
+			var traceBuffer = [],
+				cycleCounter = 0,
+				instruction,
+				memInit = (/\d/.test(memory_field.value) && memory_field.value.replace(/^\D+/).replace(/\D+$/).split(/\D/)) || [],
+				code = $("#hvm_code").val().replace(/_/g, ''),
+				i;
+			
+			MAX_CYCLES = $('#hvm_cycles').val().toInt().constrain(10000, 10000000);
+			$('#hvm_cycles').val(MAX_CYCLES);
+			
+			output = "";
+			programCounter = 0;
+			callStack = [];
+			operandStack = [];
+			
+			for (i = 0; i < MEMORY_SIZE; i += 1) {
+				memory[i] = 0;
+			}
+			for (i = 0; i < memInit.length; i += 1) {
+				memory[i] = parseInt(memInit[i], 10);    
+			}
+			
+			try {
+				while (programCounter !== code.length) {
+					cycleCounter += 1;
+					instruction = code[programCounter];
+					programCounter += 1;
+					if (cycleCounter > MAX_CYCLES) {
+						throw "too many cycles";
+					}
+					if (!instructions.hasOwnProperty(instruction)) {
+						throw "invalid instruction '" + instruction + "'";
+					}
+					instructions[instruction]();
+					if (instruction !== ' ') {
+						 traceBuffer.push(instruction + ' [' + operandStack + ']');
+					}
+					if (programCounter < 0 || programCounter > code.length) { 
+						throw 'out of code bounds'; 
+					}
+				}
+			} catch (e) {
+				output += " !ERROR: " + e;
+			}
+			$('#hvm_output').val(output);
+			$('#hvm_trace').val(traceBuffer.join('\n'));
+		};
+	
+	$('#hvm_run').on('click', run);
+	$('#hvm_code').on('input', function () {
+		$('#hvm_len').text(this.value.replace(/[^0-9+\-*\/^v<>g!:pPc$? ]/g, '').length);
+	});
+	$('#hvm_cycles').val(MAX_CYCLES);
 });
 
 jQuery(jsUtils.init);

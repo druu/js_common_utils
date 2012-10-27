@@ -131,7 +131,7 @@
 		<button id="textsort_natasc">natural</button>
 		<button id="textsort_natdesc">natural desc</button>
 	</script>
-
+	
 	<!-- TIMESTAMPS -->
 	<script type="text/xtemplate" data-module="timestamps">
 		<h2>timestamps</h2>
@@ -159,7 +159,7 @@
 			</div>
 		</form>
 	</script>
-
+	
 	<!-- RANDOM STRING -->
 	<script type="text/xtemplate" data-module="rndstring">
 		<h2>rnd_string</h2>
@@ -175,12 +175,26 @@
 		</select>
 		<label>len: </label><input type="number" id="rndstring_l" value="16" min="1" max="65535" step="1" class="span2"><br />
 		<label>chars: </label><input id="rndstring_c">
-		<button id="rndstring_go">create</button>
 	</script>
-
+	
+	<!-- HACK VM -->
+	<script type="text/xtemplate" data-module="hvm">
+		<h2>hack vm</h2>
+		<input id="hvm_mem" placeholder="memory"/>
+		<br />
+		<input id="hvm_code" placeholder="code" />
+		<button id="hvm_run">Run!</button>
+		<label>Code Length: <span id="hvm_len"></span></label>
+		<br />
+		<input id="hvm_output" placeholder="output" />
+		<input type="number" id="hvm_cycles" min="10000" max="10000000" step="5000" placeholder="cycles" />
+		<br />
+		<textarea id="hvm_trace" placeholder="trace" editable="false"></textarea>
+	</script>
+	
 	<div id="content" class="container-fluid"/></div>
-
-
+	
+	
 	<script src="./assets/js/jquery/jquery182.js"></script>
 	<script src="./assets/js/jquery/jq-ext.js"></script>
 	
@@ -194,6 +208,5 @@
 	
 	<script src="./assets/js/application/utils.js"></script>
 	<script src="./assets/js/application/main.js"></script>
-	
 </body>
 </html>
