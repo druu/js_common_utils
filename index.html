@@ -192,6 +192,19 @@
 		<textarea id="hvm_trace" placeholder="trace" editable="false"></textarea>
 	</script>
 	
+	<!-- BASE CONVERSION -->
+	<script type="text/xtemplate" data-module="base_convert">
+		<h2>base conversion</h2>
+		<textarea id="base_convert_from" class="half"></textarea>
+		<textarea id="base_convert_to"></textarea>
+		<input data-xfrom="1" type="number" min="2" max="36" step="1" value="10" />
+		<input type="number" min="2" max="36" step="1" value="16" /><br />
+		<button data-from="10" data-to="16">dec-hex</button>
+		<button data-from="16" data-to="10">hex-dec</button>
+		<button data-from="10" data-to="2">dec-bin</button>
+		<button data-from="2" data-to="10">bin-dec</button>
+	</script>
+	
 	<div id="content" class="container-fluid"/></div>
 	
 	

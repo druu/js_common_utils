@@ -462,6 +462,35 @@ jsUtils.register("rndstring", function ($container, $){
 	$chars.on('input', generate).trigger('input');
 });
 
+jsUtils.register("base_convert", function ($container, $) {
+	var bases = {
+			from: 10,
+			to: 16
+		},
+		$numInputs = $container.find('input'),
+		$ta_from = $('#base_convert_from'),
+		$ta_to = $('#base_convert_to'),
+		update = function () {
+			$ta_to.val(parseInt(($ta_from.val().replace(/[A-Z0-9]/g, '').toLowerCase() || "0"), bases.from).toString(bases.to));
+		};
+		
+	$ta_from.on('input', update);
+	$ta_to.on('input', update);
+	
+	$numInputs.on('input', function () {
+		bases[this.dataset.count() ? "from" : "to"] = this.value.toInt();
+		update();
+	});
+	
+	$container.on('click', 'button', function () {
+		bases.from = this.dataset.from.toInt();
+		bases.to = this.dataset.to.toInt();
+		$numInputs.filter('[data-xfrom]').val(bases.from);
+		$numInputs.not('[data-xfrom]').val(bases.to);
+		update();
+	});
+});
+
 jsUtils.register("hvm", function ($container, $) {
 	/** Original HVM JS implementation by Adum - www.hacker.org */
 	/** TODO: single step debugger */
@@ -570,7 +599,7 @@ jsUtils.register("hvm", function ($container, $) {
 	
 	$('#hvm_run').on('click', run);
 	$('#hvm_code').on('input', function () {
-		$('#hvm_len').text(this.value.replace(/[^0-9+\-*\/^v<>g!:pPc$? ]/g, '').length);
+		$('#hvm_len').text(this.value.replace(/[^0-9+\-*\/\^v<>g!:pPc$? ]/g, '').length);
 	});
 	$('#hvm_cycles').val(MAX_CYCLES);
 });
