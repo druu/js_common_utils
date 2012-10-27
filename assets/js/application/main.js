@@ -48,6 +48,7 @@ var jsUtils = (function (window, $, utils) {
 		// search field
 		$(document).on('keyup', function (e) {
 			if ((e.charCode || e.keyCode) === 27) {
+				$('div.util').removeClass('fullsize').show(0);
 				$('#topbar_search').focus();
 			}
 		});
