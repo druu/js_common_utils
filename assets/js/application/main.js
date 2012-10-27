@@ -464,6 +464,7 @@ jsUtils.register("rndstring", function ($container, $){
 
 jsUtils.register("hvm", function ($container, $) {
 	/** Original HVM JS implementation by Adum - www.hacker.org */
+	/** TODO: single step debugger */
 	var MAX_CYCLES  = 100000,
 		MEMORY_SIZE = 16384,
 		memory_field = document.getElementById('hvm_mem'),
