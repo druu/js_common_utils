@@ -39,7 +39,6 @@ var jsUtils = (function (window, $, utils) {
 
 			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
 		}
-		//$body.append( $content );
 
 		// force equal container height
 		$sections = $('div.util');
