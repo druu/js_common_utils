@@ -31,7 +31,7 @@
 
 	<!-- STRING LENGTH -->
 	<script type="text/xtemplate" data-module="strlen">
-		<h2>strlen</h2>
+		<h2>string length</h2>
 		<textarea id="strlen_ta"></textarea>
 		<select id="strlen_mode">
 			<option value="trim">trim whitespace</option>
@@ -70,7 +70,7 @@
 
 	<!-- SUBSTRING COUNT -->
 	<script type="text/xtemplate" data-module="substr_count">
-		<h2>substr_count</h2>
+		<h2>substring count</h2>
 		<textarea id="substr_count_ta"></textarea>
 		<input id="substr_count_tf" />
 		<label for="substr_count_cb" title="Case-insensitive">CI</label> <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
@@ -203,6 +203,13 @@
 		<button data-from="16" data-to="10">hex-dec</button>
 		<button data-from="10" data-to="2">dec-bin</button>
 		<button data-from="2" data-to="10">bin-dec</button>
+	</script>
+	
+	<!-- ASCII 2 TEXT -->
+	<script type="text/xtemplate" data-module="asciibin">
+		<h2>binary &lt;-&gt; ascii</h2>
+		<textarea id="asciibin_bin" class="half" placeholder="binary"></textarea>
+		<textarea id="asciibin_ascii" placeholder="ascii text"></textarea>
 	</script>
 	
 	<div id="content" class="container-fluid"/></div>

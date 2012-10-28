@@ -267,7 +267,6 @@
 		hashFunc = (typeof hashFunc === "function" && hashFunc) || function () { return String([].slice.call(arguments)); };
 		return function () {
 			var key = hashFunc.apply(this, arguments);
-			console.log(key);
 			return (cache.hasOwnProperty(key)) ? cache[key] : (cache[key] = fn.apply(this, arguments));
 			
 		};

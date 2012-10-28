@@ -604,4 +604,31 @@ jsUtils.register("hvm", function ($container, $) {
 	$('#hvm_cycles').val(MAX_CYCLES);
 });
 
+jsUtils.register("asciibin", function () {
+	var $ta_bin = $('#asciibin_bin'),
+		$ta_ascii = $('#asciibin_ascii');
+		
+	$ta_bin.on('input', function () {
+		$ta_ascii.val(
+			$ta_bin.
+				val().
+				replace(/[^01]/g, '').
+				nsplit(8).
+				map(function (e) {
+					return e.length !== 8 ? 
+						"?" : 
+						String.fromCharCode(parseInt(e, 2));
+				}).join(''));
+		});
+	$ta_ascii.on('input', function () {
+		var i, ret = [],
+			val = $ta_ascii.val();
+		for (i = 0; i < val.length; i += 1) {
+			ret.push((val.charCodeAt(i) & 0x7F).toString(2).pad(8));
+		}
+		$ta_bin.val(ret.join(' '));
+	});
+	
+});
+
 jQuery(jsUtils.init);
