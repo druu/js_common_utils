@@ -4,21 +4,24 @@ body {
 
 button {
 	.btn;
-	.btn-small;
+	/*.btn-small;*/
 }
 
 
 .util {
+	#gradient.vertical(#f7f7f9, #f0f0f2);
 	position: relative;
-	border: 3px solid black;
-	padding: 20px 5px 5px 5px;
-	width: 24.5%; 
+	border: 1px solid #ccc;
+	padding: 30px 0.2% 5px 0.2%;
+	*padding-top: 20px;
+	width: 24.5%;
 	display: inline-block;
 	float: left;
 	min-height: 128px;
 	min-width: 400px;
 	margin: 30px 2px 0;
 	//margin-top: 30px;
+	.border-radius(4px);
 	box-sizing : border-box;
 
 	&.fullsize {
@@ -27,20 +30,30 @@ button {
 
 	h2 {
 		position: absolute;
-		padding: 0px 10px;
-		top: -32px;
-		left: 15px;
-		width: auto;
-		display: inline-block;
-		border: 3px solid black;
-		background: white;
+		top: -1px;
+		right: -1px;
+		margin: 0;
+		padding: 3px 7px;
+		font-size: 12px;
+		line-height: 18px;
+		font-weight: bold;
+		background-color: #f5f5f5;
+		border: 1px solid #ddd;
+		color: #9da0a4;
+		.border-radius(0 4px);
+
+		.transition(color .15s linear);
+
+		&:hover {
+			color: #333;
+		}
 	}
 
 }
 
 
 textarea {
-	width: 95%;
+	width: 97%;
 	display: block;
 	height: 100px;
 }
@@ -52,6 +65,7 @@ textarea.half + textarea {
 	width: 45%;
 	float: right;
 }
+/*
 button, select, input, textarea {
 	background-color: #efefef;
 	border: 1px solid black;
@@ -77,7 +91,7 @@ td:hover input[type="checkbox"] {
 }
 
 .control {
-	
+
 }
 
 .navbar {
@@ -93,21 +107,21 @@ td:hover input[type="checkbox"] {
 	line-height: 20px
 }
 
-::-webkit-input-placeholder  { 
+::-webkit-input-placeholder  {
 	padding-top: 3px;
 	text-indent: 0px;
 	text-align: left;
 	font-size: 18px;
 	line-height: 20px;
 }
-input:-moz-placeholder { 
+input:-moz-placeholder {
 	padding-top: 3px;
 	text-indent: 0px;
 	text-align: left;
 	font-size: 18px;
 	line-height: 20px;
 }
-
+ */
 
 // some responsiveness
 @media (max-width: 1650px) {

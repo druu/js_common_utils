@@ -2,7 +2,7 @@ var jsUtils = (function (window, $) {
 	"use strict";
 	var modules = {},
 		activeModules,
-		
+
 		jsUtils = {},
 		$templates = $('script[type="text/xtemplate"]');
 
@@ -19,16 +19,16 @@ var jsUtils = (function (window, $) {
 		if (!Array.isArray(activeModules) || !activeModules.length) {
 			activeModules = modules.keyArray();
 		}
-		
+
 		for (i = 0; i < activeModules.length; i += 1) {
 			if (modules[activeModules[i]] === "undefined") {
 				continue;
 			}
 
 			$content.append(
-				$('<div id="' + activeModules[i] + '" class="util span3"/>').html($templates.filter('[data-module="' + activeModules[i] + '"]').html())
+				$('<div id="' + activeModules[i] + '" class="util "/>').html($templates.filter('[data-module="' + activeModules[i] + '"]').html())
 			);
-			
+
 			modules[activeModules[i]].call(window, $('#' + activeModules[i]), $);
 		}
 
@@ -40,7 +40,7 @@ var jsUtils = (function (window, $) {
 		$(document).
 			on('keyup', function (e) {
 				if ((e.charCode || e.keyCode) === 27) {
-					
+
 					$('div.util').removeClass('fullsize').show(0);
 					$search.val("").focus();
 				}
@@ -393,7 +393,7 @@ jsUtils.register("textsort", function ($container, $) {
 
 	$('#textsort_asc,#textsort_desc,#textsort_natasc,#textsort_natdesc').on('click', function () {
 		var sortFunc = (/desc/.test(this.id) ? "r" : "") + (/_nat/.test(this.id) ? "natsort" : "sort");
-		
+
 		$ta.val($ta.val().split('\n')[sortFunc]().join('\n'));
 	});
 });
@@ -404,24 +404,24 @@ jsUtils.register("timestamps", function ($container, $) {
 		$timestamp = $('#timestamps_u'),
 		$checkbox = $('#timestamps_utc'),
 		useUTC = false,
-		
+
 		stampChanged = function () {
 			var dateStr = new Date((parseInt($timestamp.val(), 10) * 1000) || 0).format("Y-m-d-H-i-s", useUTC);
-			
+
 			$singleFields.multiVal(dateStr.split('-'));
 		},
 		dateChanged = function () {
 			var dateString = $singleFields.multiVal().join('-'),
 				date = dateString.parseDate("Y-m-d-h-i-s", useUTC);
-			
+
 			$timestamp.val(parseInt(+date / 1000, 10));
 		},
 		utcChanged = function () {
 			useUTC = !!this.checked;
 			stampChanged();
 		};
-	
-	
+
+
 	$singleFields.on('input', dateChanged);
 	$timestamp.val(parseInt(+new Date() / 1000, 10)).on('input', stampChanged);
 	$checkbox.on('change', utcChanged).trigger('change');
@@ -441,7 +441,7 @@ jsUtils.register("rndstring", function ($container, $){
 					hex: "ABCDEF0123456789",
 					hex_low: "abcdef0123456789"
 				};
-			
+
 			pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
 			pool.alphanum_low = pool.alpha_low + pool.numeric;
 			pool.alphanum     = pool.alpha     + pool.numeric;
@@ -453,7 +453,7 @@ jsUtils.register("rndstring", function ($container, $){
 		generate = function () {
 			var len = parseInt($len.val(), 10),
 				pool = getStringPool($sel.val(), $chars.val());
-				
+
 			$ta.val(pool.repeat(Math.ceil(len / pool.length)).shuffle().substring(0, len));
 		};
 
@@ -473,15 +473,15 @@ jsUtils.register("base_convert", function ($container, $) {
 		update = function () {
 			$ta_to.val(parseInt(($ta_from.val().replace(/[A-Z0-9]/g, '').toLowerCase() || "0"), bases.from).toString(bases.to));
 		};
-		
+
 	$ta_from.on('input', update);
 	$ta_to.on('input', update);
-	
+
 	$numInputs.on('input', function () {
 		bases[this.dataset.count() ? "from" : "to"] = this.value.toInt();
 		update();
 	});
-	
+
 	$container.on('click', 'button', function () {
 		bases.from = this.dataset.from.toInt();
 		bases.to = this.dataset.to.toInt();
@@ -555,22 +555,22 @@ jsUtils.register("hvm", function ($container, $) {
 				memInit = (/\d/.test(memory_field.value) && memory_field.value.replace(/^\D+/).replace(/\D+$/).split(/\D/)) || [],
 				code = $("#hvm_code").val().replace(/_/g, ''),
 				i;
-			
+
 			MAX_CYCLES = $('#hvm_cycles').val().toInt().constrain(10000, 10000000);
 			$('#hvm_cycles').val(MAX_CYCLES);
-			
+
 			output = "";
 			programCounter = 0;
 			callStack = [];
 			operandStack = [];
-			
+
 			for (i = 0; i < MEMORY_SIZE; i += 1) {
 				memory[i] = 0;
 			}
 			for (i = 0; i < memInit.length; i += 1) {
-				memory[i] = parseInt(memInit[i], 10);    
+				memory[i] = parseInt(memInit[i], 10);
 			}
-			
+
 			try {
 				while (programCounter !== code.length) {
 					cycleCounter += 1;
@@ -586,8 +586,8 @@ jsUtils.register("hvm", function ($container, $) {
 					if (instruction !== ' ') {
 						 traceBuffer.push(instruction + ' [' + operandStack + ']');
 					}
-					if (programCounter < 0 || programCounter > code.length) { 
-						throw 'out of code bounds'; 
+					if (programCounter < 0 || programCounter > code.length) {
+						throw 'out of code bounds';
 					}
 				}
 			} catch (e) {
@@ -596,7 +596,7 @@ jsUtils.register("hvm", function ($container, $) {
 			$('#hvm_output').val(output);
 			$('#hvm_trace').val(traceBuffer.join('\n'));
 		};
-	
+
 	$('#hvm_run').on('click', run);
 	$('#hvm_code').on('input', function () {
 		$('#hvm_len').text(this.value.replace(/[^0-9+\-*\/\^v<>g!:pPc$? ]/g, '').length);
@@ -607,7 +607,7 @@ jsUtils.register("hvm", function ($container, $) {
 jsUtils.register("asciibin", function () {
 	var $ta_bin = $('#asciibin_bin'),
 		$ta_ascii = $('#asciibin_ascii');
-		
+
 	$ta_bin.on('input', function () {
 		$ta_ascii.val(
 			$ta_bin.
@@ -615,8 +615,8 @@ jsUtils.register("asciibin", function () {
 				replace(/[^01]/g, '').
 				nsplit(8).
 				map(function (e) {
-					return e.length !== 8 ? 
-						"?" : 
+					return e.length !== 8 ?
+						"?" :
 						String.fromCharCode(parseInt(e, 2));
 				}).join(''));
 		});
@@ -628,7 +628,7 @@ jsUtils.register("asciibin", function () {
 		}
 		$ta_bin.val(ret.join(' '));
 	});
-	
+
 });
 
 jQuery(jsUtils.init);
