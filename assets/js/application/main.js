@@ -1,78 +1,74 @@
-var jsUtils = (function (window, $, utils) {
+var jsUtils = (function (window, $) {
 	"use strict";
 	var modules = {},
 		activeModules,
-		
-		jsUtils = {};
+
+		jsUtils = {},
+		$templates = $('script[type="text/xtemplate"]');
 
 
 	jsUtils.init = function () {
-		var $sections, $row,
-			prop,
+		var $sections,
 			i,
-			$body = $('body'),
-			$content = $('#content');
+			$content = $('#content'),
+			$search = $('#topbar_search');
 
 		// get custom module activeModules from LocalStorage
-		// TODO: d&d reactiveModulesing, enabling/disabling
-		activeModules = utils.storage.get("jsutils-plugin-activeModules", null);
-		if (!(activeModules instanceof Array) || !activeModules.length) {
-			activeModules = [];
-			for (prop in modules) {
-
-				if (modules.hasOwnProperty(prop)) {
-					activeModules.push(prop);
-				}
-			}
+		// TODO: drag&drop reordering, enabling/disabling
+		activeModules = localStorage.xget("jsutils-plugin-activeModules", null);
+		if (!Array.isArray(activeModules) || !activeModules.length) {
+			activeModules = modules.keyArray();
 		}
 
-		// instantiate
 		for (i = 0; i < activeModules.length; i += 1) {
-			
 			if (modules[activeModules[i]] === "undefined") {
 				continue;
 			}
 
 			$content.append(
-				$('<div id="' + activeModules[i] + '" class="util span3"/>').html($('script[type="text/xtemplate"][data-module="' + activeModules[i] + '"]').html())
+				$('<div id="' + activeModules[i] + '" class="util "/>').html($templates.filter('[data-module="' + activeModules[i] + '"]').html())
 			);
 
-			modules[activeModules[i]].apply(window, [activeModules[i], $('#' + activeModules[i]), $, utils]);
+			modules[activeModules[i]].call(window, $('#' + activeModules[i]), $);
 		}
-		//$body.append( $content );
 
 		// force equal container height
 		$sections = $('div.util');
 		$sections.height(Math.max.apply(Math, $sections.map(function () { return $(this).height(); })));
 
-		// search field
-		$(document).on('keyup', function (e) {
-			if ((e.charCode || e.keyCode) === 27) {
-				$('div.util').removeClass('fullsize').show(0);
-				$('#topbar_search').focus();
-			}
-		});
+		// search field and fullscreen
+		$(document).
+			on('keyup', function (e) {
+				if ((e.charCode || e.keyCode) === 27) {
 
-		$('#topbar_search').on('keyup', function (e) {
+					$('div.util').removeClass('fullsize').show(0);
+					$search.val("").focus();
+				}
+			}).
+			on('click', 'h2', function() {
+				$(this).
+					parent().
+					toggleClass('fullsize').
+					siblings().
+					toggle(0, 'hide');
+			});
+
+		$search.on('keyup', function (e) {
 			var keywords, k, m;
 
 			if ((e.charCode || e.keyCode) === 27) {
-				$('#topbar_search').val("").trigger('keyup').blur();
+				$search.val("").trigger('keyup').blur();
 				e.stopPropagation();
 				return;
 			}
 
-			keywords = $('#topbar_search').val().replace(/[^A-Za-z0-9\_\-\s]/g, '').trim();
-			if (!keywords.length) {
-				keywords = ".";
-			}
-			keywords = keywords.split(/\s+/).map(function (word) { return new RegExp(word); });
+			keywords = $search.val().replace(/[^A-Za-z0-9\_\-\s]/g, '').trim().split(/\s+/);
 
-			myfacewhenjshaslabels: for (m = 0; m < activeModules.length; m += 1) {
+			outer: for (m = 0; m < activeModules.length; m += 1) {
 				for (k = 0; k < keywords.length; k += 1) {
-					if (!keywords[k].test(activeModules[m])) {
+					if (!activeModules[m].contains(keywords[k])) {
 						$('#' + activeModules[m]).hide();
-						continue myfacewhenjshaslabels;
+						continue outer;
 					}
 				}
 				$('#' + activeModules[m]).show();
@@ -86,9 +82,9 @@ var jsUtils = (function (window, $, utils) {
 	};
 
 	return jsUtils;
-}(window, window.jQuery, window.utils));
+}(window, window.jQuery));
 
-jsUtils.register("urlencode", function (name, $container, $, utils) {
+jsUtils.register("urlencode", function ($container, $) {
 	"use strict";
 	var $ta = $('#urlencode_ta');
 
@@ -106,7 +102,7 @@ jsUtils.register("urlencode", function (name, $container, $, utils) {
 	});
 });
 
-jsUtils.register("strlen", function (name, $container, $, utils) {
+jsUtils.register("strlen", function ($container, $) {
 	"use strict";
 	var $ta = $('#strlen_ta'),
 		$out = $('#strlen').find('label span'),
@@ -126,11 +122,11 @@ jsUtils.register("strlen", function (name, $container, $, utils) {
 		mode = $(this).val();
 		measure();
 	});
-	$ta.bind('keyup paste click blur focus', measure);
+	$ta.bind('input', measure);
 	measure();
 });
 
-jsUtils.register("replace", function (name, $container, $, utils) {
+jsUtils.register("replace", function ($container, $) {
 	"use strict";
 	var $ta_from = $container.find('textarea:first'),
 		$ta_to = $container.find('textarea:last'),
@@ -148,7 +144,7 @@ jsUtils.register("replace", function (name, $container, $, utils) {
 		$ta_to.val(error ? "ERROR: " + error : "");
 	}
 
-	$tf_from.bind('keyup keydown blur paste', function () {
+	$tf_from.bind('input', function () {
 		var val = $tf_from.val();
 		error = "";
 		if (val.length) {
@@ -163,44 +159,42 @@ jsUtils.register("replace", function (name, $container, $, utils) {
 		regex = null;
 		replace();
 	});
-	$tf_to.bind('keyup blur paste', function () {
+	$tf_to.bind('input', function () {
 		replacement = $tf_to.val() || "";
 		replace();
 	});
-	$ta_from.bind('keyup blur paste', replace);
+	$ta_from.bind('input', replace);
 });
 
-jsUtils.register("base64", function (name, $container, $, utils) {
+jsUtils.register("base64", function ($container, $) {
 	"use strict";
 	var $ta = $('#base64_ta');
 
-	$('#base64_enc').click(function (e) {
+	$('#base64_enc').click(function () {
 		$ta.val(window.base64.encode($ta.val()));
 	});
-	$('#base64_dec').click(function (e) {
+	$('#base64_dec').click(function () {
 		try {
 			$ta.val(window.base64.decode($ta.val()));
 		} catch (ex) {}
 	});
 });
 
-jsUtils.register("hash", function (name, $container, $, utils) {
+jsUtils.register("hash", function ($container, $) {
 	"use strict";
 
 	var $ta = $('#hash_ta');
-	$('#hash_md5, #hash_sha1, #hash_sha256').click(function () {
-		var funcmap = {
-			"hash_md5": window.md5,
-			"hash_sha1": window.sha1,
-			"hash_sha256": $.sha256
-		};
+	$('[data-hash]').click(function () {
+		var hashType = this.dataset.hash;
 		$ta.val(
-			$ta.val().replace(/\r/g, "\n").replace(/\n{2,}/g, "\n").trim().split("\n").map(funcmap[this.id]).join("\n")
+			$ta.val().mapLines(function (l) {
+				return (l.trim() && l[hashType]()) || l;
+			})
 		);
 	});
 });
 
-jsUtils.register("substr_count", function (name, $container, $, utils) {
+jsUtils.register("substr_count", function ($container, $) {
 	"use strict";
 	var $ta = $('#substr_count_ta'),
 		$cb = $('#substr_count_cb'),
@@ -235,228 +229,16 @@ jsUtils.register("substr_count", function (name, $container, $, utils) {
 		ci = $cb.is(':checked');
 		recount();
 	});
-	$tf.bind('keyup blur paste', recount);
-	$ta.bind('keyup blur paste', recount);
+	$tf.bind('input', recount);
+	$ta.bind('input', recount);
 	recount();
 });
 
-jsUtils.register("chmod", function (name, $container, $, utils) {
-	"use strict";
-	var $all_cb     = $('.chmod_cb'),
-		$sticky_sel = $('#chmod_sticky'),
-		$chmod_oct  = $('#chmod_result_oct'),
-		$chmod_hum  = $('#chmod_result_hum'),
-		replaceAt = function(index, char, subject) {
-			return subject.substr(0, index) + char + subject.substr(index+char.length);
-		},
-		permissions = (function() {
-			var perms = {
-				sticky : 0,
-				owner  : 0,
-				group  : 0,
-				other  : 0
-				},
-				human_representation = [
-					'---', '--x', '-w-', '-wx',
-					'r--', 'r-x', 'rw-', 'rwx'
-				],
-				print = function(type, oct) {
-					var output = human_representation[oct],
-						perm_bs = perms[type].toString(2),
-						sticky_bs = perms.sticky.toString(2),
-						replacement = output.charAt(2),
-						replace = function(s, p, i, f) {
-							return s.charAt(i) === '1' && p.charAt(2) === '1' ? f.toLowerCase() : f.toUpperCase();
-						},
-						flag, i;
-
-					perm_bs     = replaceAt(3 - perm_bs.length, perm_bs, '000');
-					sticky_bs   = replaceAt(3 - sticky_bs.length, sticky_bs, '000');
-
-					i = (type === 'owner' ? 0 : (type === 'group' ? 1 : 2) );
-
-					flag = type === 'other' ? 't' : 's';
-
-					if (sticky_bs.charAt(i) === '1') {
-						replacement = replace(sticky_bs, perm_bs, i, flag);
-						output = replaceAt(2, replacement, output);
-					}
-
-					return output;
-				};
-
-			perms.serialize = function(type) {
-				var output = '';
-				switch(type) {
-					case 'human':
-						output += print('owner', perms.owner) + print('group', perms.group) + print('other', perms.other);
-						break;
-					case 'octal':
-						output = perms.sticky.toString() + perms.owner.toString() + perms.group.toString() + perms.other.toString();
-						break;
-					default:
-						window.console.error('Invalid serialization method.');
-				}
-				return output;
-			};
-			return perms;
-		}()),
-		update = function(which) {
-			switch (which) {
-				case "octal":
-					$chmod_oct.val(permissions.serialize('octal'));
-					break;
-				case "human":
-					$chmod_hum.val(permissions.serialize('human'));
-					break;
-				default:
-					$chmod_oct.val(permissions.serialize('octal'));
-					$chmod_hum.val(permissions.serialize('human'));
-			}
-		};
-
-
-	$all_cb.on('change', function(e) {
-		var $this = $(this);
-		permissions[$this.data('name')] += parseInt(this.value, 10) * ($this.is(':checked') ? 1 : -1);
-		update();
-	});
-
-	$sticky_sel.on('change', function() {
-		permissions.sticky = parseInt($(this).val(), 10);
-		update();
-	});
-
-	$('#chmod_update_oct').on('click', function(e) {
-		var val = $chmod_oct.val().replace(/[^0-7]/g, 0),
-			len = val.length,
-			p_groups = {
-				sticky : 0,
-				owner  : 1,
-				group  : 2,
-				other  : 3
-			},
-			p_vals = [4,2,1],
-			i, el, bs, bs_sticky, checked;
-
-		if (len === 3) {
-			val = replaceAt(1, val, '0000');
-		}
-		else if (len !== 4) {
-			val = replaceAt(0, val, '0000');
-		}
-		len = 4;
-		$chmod_oct.val(val);
-
-		$all_cb.attr('checked', false);
-
-		permissions.sticky = parseInt(val.charAt(0), 10);
-		permissions.owner  = parseInt(val.charAt(1), 10);
-		permissions.group  = parseInt(val.charAt(2), 10);
-		permissions.other  = parseInt(val.charAt(3), 10);
-
-		bs_sticky = permissions.sticky.toString(2);
-		bs_sticky = replaceAt(3 - bs_sticky.length, bs_sticky, '000');
-
-		for(el in permissions) {
-			if (permissions.hasOwnProperty(el) && el !== 'print' && el !== 'serialize' && el !== 'sticky') {
-
-				bs = permissions[el].toString(2);
-				bs = replaceAt(3 - bs.length, bs, '000');
-
-				for(i = 0; i < 3; i +=1) {
-					checked = bs.charAt(i) === '1';
-					if (i === 2 && bs_sticky.charAt(p_groups.el) === '1') {
-						checked = false;
-					}
-
-					$all_cb.
-						filter('[data-name='+el+']').
-						filter('[value='+p_vals[i]+']').
-						attr('checked', checked);
-				}
-
-			}
-		}
-		$sticky_sel.val(permissions.sticky);
-		update('human');
-
-	});
-
-	$('#chmod_update_hum').on('click', function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		var val          = $chmod_hum.val().replace(/[^rwxstST\-]/g, '-'),
-			len          = val.length,
-			sticky       = '',
-			special_case = false,
-			checked      = false,
-			v_input      = [4,2,1],
-			m, n, i, c;
-
-		if (len !== 9) {
-			val = replaceAt(0, val, '---------');
-			len = 9;
-		}
-
-		permissions.sticky = permissions.owner = permissions.group = permissions.other = 0;
-		for (i = 0; i < 9; i += 1) {
-
-			special_case = false;
-			n = (i < 3 ? 'owner' : (i < 6 ? 'group' : 'other'));
-			c = val.charAt(i);
-			m = i % 3;
-
-			if (m === 0) {
-				c = (/[r\-]/.test(c)) ? c : '-';
-			}
-			else if (m === 1) {
-				c = (/[w\-]/.test(c)) ? c : '-';
-			}
-			else {
-				if(n === 'other') {
-					c = (/[xtT\-]/.test(c)) ? c : '-';
-				}
-				else {
-					c = (/[xsS\-]/.test(c)) ? c : '-';
-				}
-			}
-			val = replaceAt(i, c, val);
-
-			checked = c !== '-';
-
-			if ( m === 2 && c !== c.toLowerCase()){
-				checked = false;
-			}
-
-			permissions[n] += checked ? parseInt(v_input[m], 10) : 0;
-
-			$all_cb.
-				filter('[data-name='+n+']').
-				filter('[value='+v_input[m]+']').
-				attr('checked', checked);
-		}
-
-		$chmod_hum.val(val);
-
-		sticky += val.charAt(2).toLowerCase() === 's' ? '1' : '0';
-		sticky += val.charAt(5).toLowerCase() === 's' ? '1' : '0';
-		sticky += val.charAt(8).toLowerCase() === 't' ? '1' : '0';
-
-		permissions.sticky = parseInt(sticky, 2);
-
-		$sticky_sel.val(permissions.sticky);
-
-		update('octal');
-	});
-});
-
-jsUtils.register("chmod2", function (name, $container, $, utils) {
+jsUtils.register("chmod", function ($container, $) {
 	"use strict";
 	var $all_cb = $container.find('input[type="checkbox"]'),
-		tf_oct = $('#chmod2_result_oct')[0],
-		tf_hum = $('#chmod2_result_hum')[0],
+		tf_oct = $('#chmod_result_oct')[0],
+		tf_hum = $('#chmod_result_hum')[0],
 
 		validRe = {
 			octal: /^[0-7]{4}$/,
@@ -485,7 +267,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				}
 			});
 
-			return utils.string.pad(num.toString(8), 4);
+			return num.toString(8).pad(4);
 		},
 
 
@@ -494,13 +276,14 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				throw "Invalid human-readable string";
 			}
 
-			str = parseInt(
-				(/s/i.test(str.charAt(2)) ? '1' : '0') +
-				(/s/i.test(str.charAt(5)) ? '1' : '0') +
-				(/t/i.test(str.charAt(8)) ? '1' : '0') +
-				str.replace(/-|[ST]/g, '0').replace(/[^0]/g, '1'), 2).
-				toString(8);
-			return utils.string.pad(str, 4);
+			return parseInt(
+					(/s/i.test(str.charAt(2)) ? '1' : '0') +
+					(/s/i.test(str.charAt(5)) ? '1' : '0') +
+					(/t/i.test(str.charAt(8)) ? '1' : '0') +
+					str.replace(/-|[ST]/g, '0').replace(/[^0]/g, '1'), 2
+				).
+				toString(8).
+				pad(4);
 		},
 
 		octal2human = function (str) {
@@ -512,7 +295,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				throw "Invalid octal";
 			}
 
-			str = utils.string.pad(parseInt(str, 8).toString(2), 12);
+			str = parseInt(str, 8).toString(2).pad(12);
 			special = str.substring(0, 3);
 			str = str.substring(3);
 
@@ -527,14 +310,14 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 				}).join('');
 		},
 
-		checkboxTrigger = function (e) {
+		checkboxTrigger = function () {
 			var oct = cb2octal();
 			tf_oct.value = oct;
 			tf_hum.value = octal2human(oct);
 		},
 
-		octalTrigger = function (e) {
-			var octval = tf_oct.value.trim();
+		octalTrigger = function () {
+			var octval = tf_oct.value.trim().pad(4);
 
 			if (!validRe.octal.test(octval)) {
 				tf_hum.value = "ERROR";
@@ -545,7 +328,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 			tf_hum.value = octal2human(octval);
 		},
 
-		humanTrigger = function (e) {
+		humanTrigger = function () {
 			var humval = tf_hum.value.trim(),
 				octval;
 
@@ -562,8 +345,8 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 	// re-order checkbox collection from "u-g-o-special" to "special-u-g-o"
 	$all_cb = $.merge($all_cb.slice(9), $all_cb.slice(0, 9));
 
-	$('#chmod2_result_oct').on('keyup blur', octalTrigger);
-	$('#chmod2_result_hum').on('keyup blur', humanTrigger);
+	$('#chmod_result_oct').on('input', octalTrigger);
+	$('#chmod_result_hum').on('input', humanTrigger);
 	$container.
 		find('table').
 		on('change', 'input:checkbox', checkboxTrigger).
@@ -576,7 +359,7 @@ jsUtils.register("chmod2", function (name, $container, $, utils) {
 		});
 });
 
-jsUtils.register("texttransform", function (name, $container, $, utils) {
+jsUtils.register("texttransform", function ($container, $) {
 	"use strict";
 	var $ta = $('#texttransform_ta');
 
@@ -595,73 +378,56 @@ jsUtils.register("texttransform", function (name, $container, $, utils) {
 		$ta.val(
 			$ta.
 				val().
-				replace(/\r/g, "\n").
-				replace(/\n{2,}/g, "\n").
-				split("\n").
-				map(function (line) {
+				mapLines(function (line) {
 					var first = line.charAt(0),
 						transformed = first[transFunc]();
 					return transformed === first ? line : transformed + line.substring(1);
-				}).
-				join("\n")
+				})
 		);
 	});
 });
 
-jsUtils.register("textsort", function (name, $container, $, utils) {
+jsUtils.register("textsort", function ($container, $) {
 	"use strict";
 	var $ta = $('#textsort_ta');
 
 	$('#textsort_asc,#textsort_desc,#textsort_natasc,#textsort_natdesc').on('click', function () {
-		var val = $ta.
-				val().
-				replace(/\r/g, "\n").
-				replace(/\n{2,}/g, "\n").
-				split("\n");
+		var sortFunc = (/desc/.test(this.id) ? "r" : "") + (/_nat/.test(this.id) ? "natsort" : "sort");
 
-		if (/_nat/.test(this.id)) {
-			val.sort(window.naturalSort);
-		} else {
-			val.sort();
-		}
-		if (/desc/.test(this.id)) {
-			val.reverse();
-		}
-		$ta.val(val.join('\n'));
+		$ta.val($ta.val().split('\n')[sortFunc]().join('\n'));
 	});
 });
 
-jsUtils.register('timestamps', function (name, $container, $, utils) {
+jsUtils.register("timestamps", function ($container, $) {
 	"use strict";
 	var $singleFields = $container.find('input:not([id])'),
 		$timestamp = $('#timestamps_u'),
 		$checkbox = $('#timestamps_utc'),
 		useUTC = false,
-		
+
 		stampChanged = function () {
-			var date = new Date((parseInt($timestamp.val(), 10) * 1000) || 0),
-				dateStr = utils.date.format("Y-m-d-H-i-s", date, useUTC);
-			
+			var dateStr = new Date((parseInt($timestamp.val(), 10) * 1000) || 0).format("Y-m-d-H-i-s", useUTC);
+
 			$singleFields.multiVal(dateStr.split('-'));
 		},
 		dateChanged = function () {
 			var dateString = $singleFields.multiVal().join('-'),
-				date = utils.date.parse(dateString, "Y-m-d-h-i-s", useUTC);
-			
+				date = dateString.parseDate("Y-m-d-h-i-s", useUTC);
+
 			$timestamp.val(parseInt(+date / 1000, 10));
 		},
 		utcChanged = function () {
 			useUTC = !!this.checked;
 			stampChanged();
 		};
-	
-	
+
+
 	$singleFields.on('input', dateChanged);
 	$timestamp.val(parseInt(+new Date() / 1000, 10)).on('input', stampChanged);
 	$checkbox.on('change', utcChanged).trigger('change');
 });
 
-jsUtils.register('rndstring', function (name, $container, $, utils){
+jsUtils.register("rndstring", function ($container, $){
 	"use strict";
 	var $ta  = $('#rndstring_ta'),
 		$sel = $('#rndstring_sel'),
@@ -675,7 +441,7 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 					hex: "ABCDEF0123456789",
 					hex_low: "abcdef0123456789"
 				};
-			
+
 			pool.alpha        = pool.alpha_low + pool.alpha_low.toUpperCase();
 			pool.alphanum_low = pool.alpha_low + pool.numeric;
 			pool.alphanum     = pool.alpha     + pool.numeric;
@@ -687,8 +453,8 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 		generate = function () {
 			var len = parseInt($len.val(), 10),
 				pool = getStringPool($sel.val(), $chars.val());
-				
-			$ta.val(utils.string.shuffle(utils.string.repeat(pool, Math.ceil(len / pool.length))).substring(0, len));
+
+			$ta.val(pool.repeat(Math.ceil(len / pool.length)).shuffle().substring(0, len));
 		};
 
 	$sel.on('change', generate);
@@ -696,12 +462,173 @@ jsUtils.register('rndstring', function (name, $container, $, utils){
 	$chars.on('input', generate).trigger('input');
 });
 
-jQuery(function($){
-	$('body').on('click', 'h2', function(){
-		var $container = $(this).parent();
-		$container.toggleClass('fullsize');
-		$container.siblings().toggle(0, 'hide');
+jsUtils.register("base_convert", function ($container, $) {
+	var bases = {
+			from: 10,
+			to: 16
+		},
+		$numInputs = $container.find('input'),
+		$ta_from = $('#base_convert_from'),
+		$ta_to = $('#base_convert_to'),
+		update = function () {
+			$ta_to.val(parseInt(($ta_from.val().replace(/[A-Z0-9]/g, '').toLowerCase() || "0"), bases.from).toString(bases.to));
+		};
+
+	$ta_from.on('input', update);
+	$ta_to.on('input', update);
+
+	$numInputs.on('input', function () {
+		bases[this.dataset.count() ? "from" : "to"] = this.value.toInt();
+		update();
 	});
+
+	$container.on('click', 'button', function () {
+		bases.from = this.dataset.from.toInt();
+		bases.to = this.dataset.to.toInt();
+		$numInputs.filter('[data-xfrom]').val(bases.from);
+		$numInputs.not('[data-xfrom]').val(bases.to);
+		update();
+	});
+});
+
+jsUtils.register("hvm", function ($container, $) {
+	/** Original HVM JS implementation by Adum - www.hacker.org */
+	/** TODO: single step debugger */
+	var MAX_CYCLES  = 100000,
+		MEMORY_SIZE = 16384,
+		memory_field = document.getElementById('hvm_mem'),
+		operandStack,
+		callStack,
+		programCounter,
+		code,
+		memory = Array.prototype.constructor.call(MEMORY_SIZE),
+		output = "",
+		stackPush = function (v) {
+			if (!isFinite(v)) {
+				throw "illegal value";
+			}
+			if (v > 2147483647 || v < -2147483648) {
+				throw "integer overflow";
+			}
+			operandStack.push(v);
+		},
+		stackPop = function () {
+			if (!operandStack.length) {
+				throw "stack underflow";
+			}
+			return operandStack.pop();
+		},
+		instructions = {
+			' ': function () {},
+			'0': stackPush.bind(this, 0),
+			'1': stackPush.bind(this, 1),
+			'2': stackPush.bind(this, 2),
+			'3': stackPush.bind(this, 3),
+			'4': stackPush.bind(this, 4),
+			'5': stackPush.bind(this, 5),
+			'6': stackPush.bind(this, 6),
+			'7': stackPush.bind(this, 7),
+			'8': stackPush.bind(this, 8),
+			'9': stackPush.bind(this, 9),
+			'+': function() { stackPush(stackPop() + stackPop()); },
+			'-': function() { var a = stackPop(), b = stackPop(); stackPush(b - a); },
+			'*': function() { stackPush(stackPop() * stackPop()); },
+			'/': function() { var a = stackPop(), b = stackPop(); stackPush(Math.floor(b / a)); },
+			'p': function() { output += stackPop(); },
+			'P': function() { output += String.fromCharCode(stackPop() & 0x7F); },
+			':': function() { var a = stackPop(), b = stackPop(); if (b < a) { stackPush(-1); } else if (b === a) { stackPush(0); } else { stackPush(1); }},
+			'g': function() { programCounter += stackPop(); },
+			'?': function() { var offset = stackPop(); if (stackPop() === 0) { programCounter += offset; }},
+			'c': function() { callStack.push(programCounter); programCounter = stackPop(); },
+			'$': function() { if (!callStack.length) { throw "call stack underflow"; } programCounter = callStack.pop(); },
+			'<': function() { var addr = stackPop(); if (addr < 0 || addr >= memory.length) { throw 'memory read access violation @' + addr; } stackPush(memory[addr]); },
+			'>': function() { var addr = stackPop(); if (addr < 0 || addr >= memory.length) { throw 'memory write access violation @' + addr; } memory[addr] = stackPop(); },
+			'^': function() { var i = stackPop(); stackPush(operandStack[operandStack.length-i-1]); },
+			'v': function() { var i = stackPop(), v = operandStack.splice(operandStack.length - i - 1, 1); stackPush(v[0]); },
+			'd': stackPop.bind(this),
+			'!': function() { programCounter = code.length; }
+		},
+		run = function () {
+			var traceBuffer = [],
+				cycleCounter = 0,
+				instruction,
+				memInit = (/\d/.test(memory_field.value) && memory_field.value.replace(/^\D+/).replace(/\D+$/).split(/\D/)) || [],
+				code = $("#hvm_code").val().replace(/_/g, ''),
+				i;
+
+			MAX_CYCLES = $('#hvm_cycles').val().toInt().constrain(10000, 10000000);
+			$('#hvm_cycles').val(MAX_CYCLES);
+
+			output = "";
+			programCounter = 0;
+			callStack = [];
+			operandStack = [];
+
+			for (i = 0; i < MEMORY_SIZE; i += 1) {
+				memory[i] = 0;
+			}
+			for (i = 0; i < memInit.length; i += 1) {
+				memory[i] = parseInt(memInit[i], 10);
+			}
+
+			try {
+				while (programCounter !== code.length) {
+					cycleCounter += 1;
+					instruction = code[programCounter];
+					programCounter += 1;
+					if (cycleCounter > MAX_CYCLES) {
+						throw "too many cycles";
+					}
+					if (!instructions.hasOwnProperty(instruction)) {
+						throw "invalid instruction '" + instruction + "'";
+					}
+					instructions[instruction]();
+					if (instruction !== ' ') {
+						 traceBuffer.push(instruction + ' [' + operandStack + ']');
+					}
+					if (programCounter < 0 || programCounter > code.length) {
+						throw 'out of code bounds';
+					}
+				}
+			} catch (e) {
+				output += " !ERROR: " + e;
+			}
+			$('#hvm_output').val(output);
+			$('#hvm_trace').val(traceBuffer.join('\n'));
+		};
+
+	$('#hvm_run').on('click', run);
+	$('#hvm_code').on('input', function () {
+		$('#hvm_len').text(this.value.replace(/[^0-9+\-*\/\^v<>g!:pPc$? ]/g, '').length);
+	});
+	$('#hvm_cycles').val(MAX_CYCLES);
+});
+
+jsUtils.register("asciibin", function () {
+	var $ta_bin = $('#asciibin_bin'),
+		$ta_ascii = $('#asciibin_ascii');
+
+	$ta_bin.on('input', function () {
+		$ta_ascii.val(
+			$ta_bin.
+				val().
+				replace(/[^01]/g, '').
+				nsplit(8).
+				map(function (e) {
+					return e.length !== 8 ?
+						"?" :
+						String.fromCharCode(parseInt(e, 2));
+				}).join(''));
+		});
+	$ta_ascii.on('input', function () {
+		var i, ret = [],
+			val = $ta_ascii.val();
+		for (i = 0; i < val.length; i += 1) {
+			ret.push((val.charCodeAt(i) & 0x7F).toString(2).pad(8));
+		}
+		$ta_bin.val(ret.join(' '));
+	});
+
 });
 
 jQuery(jsUtils.init);
