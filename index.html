@@ -24,24 +24,24 @@
 	<script type="text/xtemplate" data-module="urlencode">
 		<h2>url-encode</h2>
 		<textarea id="urlencode_ta"></textarea>
-		<div class="btn-group">
-			<button class="btn" id="urlencode_enc">url-encode</button>
-			<button class="btn" id="urlencode_dec">url-decode</button>
-			<button class="btn" id="urlencode_esc_enc">escape</button>
-			<button class="btn" id="urlencode_esc_dec">unescape</button>
-		</siv>
+		<button class="btn" id="urlencode_enc">url-encode</button>
+		<button class="btn" id="urlencode_dec">url-decode</button>
+		<button class="btn" id="urlencode_esc_enc">escape</button>
+		<button class="btn" id="urlencode_esc_dec">unescape</button>
 	</script>
 
 	<!-- STRING LENGTH -->
 	<script type="text/xtemplate" data-module="strlen">
 		<h2>string length</h2>
 		<textarea id="strlen_ta"></textarea>
-		<select id="strlen_mode">
-			<option value="trim">trim whitespace</option>
-			<option value="include">count whitespace</option>
-			<option value="ignore">ignore all whitespace</option>
-		</select>
-		<label>Length: <span></span></label>
+		<div class="control-group"><div class="form-inline controls">
+			<select id="strlen_mode">
+				<option value="trim">trim whitespace</option>
+				<option value="include">count whitespace</option>
+				<option value="ignore">ignore all whitespace</option>
+			</select>
+			<label>Length: <span></span></label>
+		</div></div>
 	</script>
 
 	<!-- REGEX REPLACE -->
@@ -49,9 +49,10 @@
 		<h2>replace</h2>
 		<textarea class="half"></textarea>
 		<textarea></textarea>
-		<br class="clear">
-		<input id="replace_from" /> &#187;
-		<input id="replace_to" />
+		<div class="control-group"><div class="form-inline controls">
+			<input type="text" class="input-medium" id="replace_from" /> &#187;
+			<input type="text" class="input-medium" id="replace_to" />
+		</div></div>
 	</script>
 
 	<!-- BASE64 -->
@@ -75,15 +76,20 @@
 	<script type="text/xtemplate" data-module="substr_count">
 		<h2>substring count</h2>
 		<textarea id="substr_count_ta"></textarea>
-		<input id="substr_count_tf" />
-		<label for="substr_count_cb" title="Case-insensitive">CI</label> <input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
-		<label>Count: <span></span></label>
+		<div class="control-group">
+			<div class="form-inline controls">
+				<input type="text" id="substr_count_tf" />
+				<label for="substr_count_cb" title="Case-insensitive">CI</label>
+				<input type="checkbox" checked="ckecked" id="substr_count_cb"></input>
+				<label>Count: <span></span></label>
+			</div>
+		</div>
 	</script>
 
 	<!-- CHMOD -->
 	<script type="text/xtemplate" data-module="chmod">
 		<h2>chmod</h2>
-		<table border="0" cellspacing="0" cellpadding="2">
+		<table class="table-condensed" width="100%">
 			<tr><td></td>
 				<td>read</td>
 				<td>write</td>
@@ -105,13 +111,27 @@
 				<td><input type="checkbox" /></td>
 			</tr>
 			<tr><td>special</td>
-				<td><input type="checkbox" id="chmod_uid"/> <label for="chmod_uid">Set UID</label></td>
-				<td><input type="checkbox" id="chmod_gid"/> <label for="chmod_gid">Set GID</label></td>
-				<td><input type="checkbox" id="chmod_sticky"/> <label for="chmod_sticky">Sticky</label></td>
+				<td>
+					<div class="control-group"><div class="form-inline controls">
+						<input type="checkbox" id="chmod_uid"/> <label for="chmod_uid">Set UID</label>
+					</div></div>
+				</td>
+				<td>
+					<div class="control-group"><div class="form-inline controls">
+						<input type="checkbox" id="chmod_gid"/> <label for="chmod_gid">Set GID</label>
+					</div></div>
+				</td>
+				<td>
+					<div class="control-group"><div class="form-inline controls">
+						<input type="checkbox" id="chmod_sticky"/> <label for="chmod_sticky">Sticky</label>
+					</div></div>
+				</td>
 			</tr>
 		</table>
-		<input id="chmod_result_oct" value="0000" maxlength="4">
-		<input id="chmod_result_hum" value="---------" maxlength="9">
+		<div class="control-group"><div class="form-inline controls">
+			<input type="text" class="input-medium" id="chmod_result_oct" value="0000" maxlength="4">
+			<input type="text" class="input-medium" id="chmod_result_hum" value="---------" maxlength="9">
+		</div></div>
 	</script>
 
 	<!-- TEXT TRANSFORMATIONS -->
@@ -192,15 +212,20 @@
 	<!-- HACK VM -->
 	<script type="text/xtemplate" data-module="hvm">
 		<h2>hack vm</h2>
-		<input id="hvm_mem" placeholder="memory"/>
-		<br />
-		<input id="hvm_code" placeholder="code" />
-		<button id="hvm_run">Run!</button>
-		<label>Code Length: <span id="hvm_len"></span></label>
-		<br />
-		<input id="hvm_output" placeholder="output" />
-		<input type="number" id="hvm_cycles" min="10000" max="10000000" step="5000" placeholder="cycles" />
-		<br />
+		<div class="control-group"><div class="controls">
+			<input type="text" id="hvm_mem" placeholder="memory"/>
+		</div></div>
+		<div class="control-group"><div class="controls">
+			<div class="input-append">
+				<input type="text" id="hvm_code" placeholder="code" />
+				<button class="btn" id="hvm_run">Run!</button>
+				<span class="add-on">Code Length: <span id="hvm_len">0</span></span>
+			</div>
+		</div></div>
+		<div class="control-group"><div class="form-inline controls">
+			<input type="text" id="hvm_output" placeholder="output" />
+			<input type="number" id="hvm_cycles" min="10000" max="10000000" step="5000" placeholder="cycles" />
+		</div></div>
 		<textarea id="hvm_trace" placeholder="trace" editable="false"></textarea>
 	</script>
 
