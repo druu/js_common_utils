@@ -471,7 +471,7 @@ jsUtils.register("base_convert", function ($container, $) {
 		$ta_from = $('#base_convert_from'),
 		$ta_to = $('#base_convert_to'),
 		update = function () {
-			$ta_to.val(parseInt(($ta_from.val().replace(/[A-Z0-9]/g, '').toLowerCase() || "0"), bases.from).toString(bases.to));
+			$ta_to.val(parseInt(($ta_from.val().replace(/[^A-Z0-9]/g, '').toLowerCase() || "0"), bases.from).toString(bases.to));
 		};
 
 	$ta_from.on('input', update);
