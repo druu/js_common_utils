@@ -160,7 +160,7 @@ jsUtils.register("replace", function ($container, $) {
 		replace();
 	});
 	$tf_to.bind('input', function () {
-		replacement = $tf_to.val() || "";
+		replacement = ($tf_to.val() || "").replace(/\\n/g, "\n").replace(/\\r/g, "\r").replace(/\\t/g, "\t");
 		replace();
 	});
 	$ta_from.bind('input', replace);
