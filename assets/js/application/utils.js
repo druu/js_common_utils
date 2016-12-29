@@ -128,9 +128,8 @@
 	});
 	def(String.prototype, "repeat", function (times) {
 		times = parseInt(Math.abs(times), 10);
-		if (!times) {
-			return;
-		}
+		if (!times) { return ''; } 
+		if (!isFinite(times)) { throw new RangeError(); }
 		return Array.prototype.constructor.call(Array, times + 1).join(this);
 	});
 	def(String.prototype, "parseDate", function (format, useUTC) {
@@ -333,7 +332,7 @@
 	 * Local Storage Extensions
 	 * ========================
 	 */
-	 def(window.localStorage, "xget", function (key, fallback) {
+	 def(window.localStorage.__proto__, "xget", function (key, fallback) {
 		var val;
 		try {
 			val = this.getItem(String(key));
@@ -343,7 +342,7 @@
 			return fallback;
 		}
 	});
-	def(window.localStorage, "xset", function (key, val) {
+	def(window.localStorage.__proto__, "xset", function (key, val) {
 		try {
 			val = JSON.stringify(val);
 			this.setItem(String(key), val);
@@ -352,7 +351,7 @@
 			return false;
 		}
 	});
-	def(window.localStorage, "persist", function (element, key, defaultValue) {
+	def(window.localStorage.__proto__, "persist", function (element, key, defaultValue) {
 		$(element).val(window.localStorage.xget(key, defaultValue));
 		
 		$(window).on('beforeunload', function () {
